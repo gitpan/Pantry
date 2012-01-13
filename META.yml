@@ -1,0 +1,69 @@
+---
+abstract: 'Configuration management tool for chef-solo'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  App::Cmd::Tester: 0
+  Capture::Tiny: 0
+  File::Find: 0
+  File::pushd: 1.00
+  Scalar::Util: 0
+  Test::More: 0.92
+  strict: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112621'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pantry
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Pantry:
+    file: lib/Pantry.pm
+    version: 0.001
+  Pantry::App:
+    file: lib/Pantry/App.pm
+    version: 0.001
+  Pantry::App::Command:
+    file: lib/Pantry/App/Command.pm
+    version: 0.001
+  Pantry::App::Command::create:
+    file: lib/Pantry/App/Command/create.pm
+    version: 0.001
+  Pantry::App::Command::edit:
+    file: lib/Pantry/App/Command/edit.pm
+    version: 0.001
+  Pantry::App::Command::init:
+    file: lib/Pantry/App/Command/init.pm
+    version: 0.001
+  Pantry::App::Command::sync:
+    file: lib/Pantry/App/Command/sync.pm
+    version: 0.001
+requires:
+  App::Cmd::Setup: 0.311
+  File::Basename: 0
+  File::Path: 0
+  File::Slurp: 0
+  File::Temp: 0.22
+  IPC::Cmd: 0
+  JSON: 0
+  Net::OpenSSH: 0
+  autodie: 0
+  namespace::clean: 0
+  perl: v5.14
+  warnings: 0
+resources:
+  bugtracker: http://github.com/dagolden/Pantry/issues
+  homepage: https://github.com/dagolden/pantry
+  repository: https://github.com/dagolden/pantry.git
+version: 0.001

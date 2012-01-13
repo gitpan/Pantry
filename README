@@ -1,0 +1,121 @@
+NAME
+    Pantry - Configuration management tool for chef-solo
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+    N.B. This program doesn't do much yet, but I'll expand this synopses
+    incrementally as features are added
+
+      $ mkdir my-project
+      $ cd my-project
+      $ pantry init
+      $ pantry create node foo.example.com
+      $ pantry edit node foo.example.com
+      $ pantry sync node foo.example.com
+
+DESCRIPTION
+    "pantry" is a utility to make it easier to manage a collection of
+    computers with the configuration management tool chef-solo
+    <http://wiki.opscode.com/display/chef/Chef+Solo>
+
+USAGE
+    Arguments to the "pantry" command line tool follow a regular structure:
+
+      $ pantry VERB [[NOUN] [ARGUMENTS...]]
+
+    See the following sections for details and examples by topic.
+
+  Pantry setup
+      $ pantry init
+
+    This initializes a pantry in the current directory. Currently, it just
+    creates some directories for use storing cookbooks, node data, etc.
+
+  Managing nodes
+      $ pantry create node NAME
+
+    Creates a node configuration file for the given "NAME". The "NAME" must
+    be a valid DNS name or IP address.
+
+      $ pantry edit node NAME
+
+    Invokes the editor given by the environment variable "EDITOR" on the
+    configuration file for the "name" node.
+
+      $ pantry sync node NAME
+
+    Copies cookbooks and configuration data to the "NAME" node and invokes
+    "chef-solo" via "ssh" to start a configuration run.
+
+AUTHENTICATION
+    "pantry" relies on OpenSSH for secure communications with managed nodes,
+    but does not manage keys itself. Instead, it expects the user to manage
+    keys using standard OpenSSH configuration and tools.
+
+    The user should specify SSH private keys to use in the ssh config file.
+    One approach would be to use the "IdentityFile" with a host-name
+    wildcard:
+
+      IdentityFile ~/.ssh/identities/id_dsa_%h
+
+    This would allow a directory of host-specific identities (which could
+    all be symlinks to a master key). Another alternative might be to create
+    a master key for each environment:
+
+      IdentityFile ~/.ssh/id_dsa_dev
+      IdentityFile ~/.ssh/id_dsa_test
+      IdentityFile ~/.ssh/id_dsa_prod
+
+    "pantry" also assumes that the user will unlock keys using "ssh-agent".
+    For example, assuming that ssh-agent has not already been invoked by a
+    graphical shell session, it can be started with a subshell of a
+    terminal:
+
+      $ ssh-agent $SHELL
+
+    Then private keys can be unlocked in advance of running "pantry" using
+    "ssh-add":
+
+      $ ssh-add ~/.ssh/id_dsa_test
+      $ pantry ...
+
+    See the documentation for "ssh-add" for control over how long keys stay
+    unlocked.
+
+SEE ALSO
+    Inspiration for this tool came from similar chef-solo management tools.
+    In addition to being implemented in different languages, each approaches
+    the problem in slightly different ways, neither of which fit my
+    priorities. Nevertheless, if you use chef-solo, you might consider them
+    as well:
+
+    *   littlechef <https://github.com/tobami/littlechef> (Python)
+
+    *   pocketknife <https://github.com/igal/pocketknife> (Ruby)
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <http://github.com/dagolden/Pantry/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/pantry>
+
+      git clone https://github.com/dagolden/pantry.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2011 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+
