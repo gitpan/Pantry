@@ -13,12 +13,14 @@ my %WriteMakefileArgs = (
   "AUTHOR" => "David Golden <dagolden\@cpan.org>",
   "BUILD_REQUIRES" => {
     "App::Cmd::Tester" => 0,
+    "App::Cmd::Tester::CaptureExternal" => 0,
     "Capture::Tiny" => 0,
+    "Exporter" => 0,
     "File::Find" => 0,
     "File::pushd" => "1.00",
     "Scalar::Util" => 0,
-    "Test::More" => "0.92",
-    "strict" => 0
+    "Test::More" => "0.96",
+    "parent" => 0
   },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => "6.30"
@@ -30,21 +32,31 @@ my %WriteMakefileArgs = (
   "LICENSE" => "apache",
   "NAME" => "Pantry",
   "PREREQ_PM" => {
-    "App::Cmd::Setup" => "0.311",
+    "App::Cmd::Setup" => "0.317",
     "File::Basename" => 0,
     "File::Path" => 0,
     "File::Slurp" => 0,
     "File::Temp" => "0.22",
     "IPC::Cmd" => 0,
-    "JSON" => 0,
+    "JSON" => 2,
+    "List::AllUtils" => 0,
+    "Moose" => 2,
+    "Moose::Role" => 0,
+    "Moose::Util" => 0,
+    "MooseX::Role::Parameterized" => 0,
+    "MooseX::Types::Path::Class::MoreCoercions" => "0.002",
     "Net::OpenSSH" => 0,
+    "Path::Class" => 0,
+    "Path::Class::Rule" => 0,
     "autodie" => 0,
+    "namespace::autoclean" => 0,
     "namespace::clean" => 0,
+    "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
-    "TESTS" => "t/*.t t/create/*.t t/edit/*.t t/init/*.t"
+    "TESTS" => "t/*.t t/app/*.t t/app/apply/*.t t/app/create/*.t t/app/edit/*.t t/app/init/*.t t/app/show/*.t t/app/strip/*.t t/model/*.t"
   }
 );
 

@@ -1,17 +1,18 @@
 use v5.14;
 use warnings;
 
-package Pantry::App::Command::create;
-# ABSTRACT: Implements pantry create subcommand
+package Pantry::App::Command::list;
+# ABSTRACT: Implements pantry list subcommand
 our $VERSION = '0.002'; # VERSION
 
 use Pantry::App -command;
 use autodie;
+use Path::Class::Rule;
 
 use namespace::clean;
 
 sub abstract {
-  return 'create items in a pantry (nodes, roles, etc.)';
+  return 'list information about pantry contents';
 }
 
 sub options {
@@ -20,19 +21,14 @@ sub options {
 
 sub validate {
   my ($self, $opts, $args) = @_;
-  my ($type, $name) = @$args;
+  my ($type) = @$args;
 
   # validate type
   if ( ! length $type ) {
     $self->usage_error( "This command requires a target type and name" );
   }
-  elsif ( $type ne 'node' ) {
+  elsif ( $type !~ /nodes?/ ) {
     $self->usage_error( "Invalid type '$type'" );
-  }
-
-  # validate name
-  if ( ! length $name ) {
-    $self->usage_error( "This command requires the name for the thing to create" );
   }
 
   return;
@@ -41,22 +37,24 @@ sub validate {
 sub execute {
   my ($self, $opt, $args) = @_;
 
-  my ($type, $name) = splice(@$args, 0, 2);
+  my ($type) = shift @$args;
 
-  if ( $type eq 'node' ) {
-    my $node = $self->pantry->node( $name );
-    if ( -e $node->path ) {
-      $self->usage_error( "Node '$name' already exists" );
-    }
-    else {
-      $node->save;
-    }
-  }
+  $self->_list_node;
 
   return;
 }
 
+#--------------------------------------------------------------------------#
+# Internal
+#--------------------------------------------------------------------------#
+
+sub _list_node {
+  my ($self) = @_;
+  my $pcr = Path::Class::Rule->new->file->name("*.json");
+  say $_->basename for $pcr->all("environments/_default");
+}
 1;
+
 
 
 # vim: ts=2 sts=2 sw=2 et:
@@ -66,7 +64,7 @@ __END__
 
 =head1 NAME
 
-Pantry::App::Command::create - Implements pantry create subcommand
+Pantry::App::Command::list - Implements pantry list subcommand
 
 =head1 VERSION
 
@@ -74,12 +72,22 @@ version 0.002
 
 =head1 SYNOPSIS
 
-  $ pantry create node foo.example.com
+  $ pantry list nodes
 
 =head1 DESCRIPTION
 
-This class implements the C<pantry create> command, which is used to create a new node data file
-in a pantry.
+This class implements the C<pantry list> command, which is used to generate a list
+of items in a pantry directory.
+
+Supported types are:
+
+=over 4
+
+=item *
+
+C<node>, C<nodes> -- list nodes
+
+=back
 
 =for Pod::Coverage options validate
 

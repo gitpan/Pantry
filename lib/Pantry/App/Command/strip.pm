@@ -1,8 +1,8 @@
 use v5.14;
 use warnings;
 
-package Pantry::App::Command::create;
-# ABSTRACT: Implements pantry create subcommand
+package Pantry::App::Command::strip;
+# ABSTRACT: Implements pantry strip subcommand
 our $VERSION = '0.002'; # VERSION
 
 use Pantry::App -command;
@@ -11,7 +11,7 @@ use autodie;
 use namespace::clean;
 
 sub abstract {
-  return 'create items in a pantry (nodes, roles, etc.)';
+  return 'strip recipes or attributes from a node'
 }
 
 sub options {
@@ -32,7 +32,7 @@ sub validate {
 
   # validate name
   if ( ! length $name ) {
-    $self->usage_error( "This command requires the name for the thing to create" );
+    $self->usage_error( "This command requires the name for the thing to modify" );
   }
 
   return;
@@ -44,13 +44,22 @@ sub execute {
   my ($type, $name) = splice(@$args, 0, 2);
 
   if ( $type eq 'node' ) {
-    my $node = $self->pantry->node( $name );
-    if ( -e $node->path ) {
-      $self->usage_error( "Node '$name' already exists" );
+    my $node = $self->pantry->node( $name )
+      or $self->usage_error( "Node '$name' does not exist" );
+
+    if ($opt->{recipe}) {
+      $node->remove_from_run_list(map { "recipe[$_]" } @{$opt->{recipe}});
     }
-    else {
-      $node->save;
+
+    if ($opt->{default}) {
+      for my $attr ( @{ $opt->{default} } ) {
+        my ($key, $value) = split /=/, $attr, 2; # split on first '='
+        # if they gave a value, we ignore it
+        $node->delete_attribute($key);
+      }
     }
+
+    $node->save;
   }
 
   return;
@@ -66,7 +75,7 @@ __END__
 
 =head1 NAME
 
-Pantry::App::Command::create - Implements pantry create subcommand
+Pantry::App::Command::strip - Implements pantry strip subcommand
 
 =head1 VERSION
 
@@ -74,12 +83,12 @@ version 0.002
 
 =head1 SYNOPSIS
 
-  $ pantry create node foo.example.com
+  $ pantry strip node foo.example.com --recipe nginx --default nginx.port
 
 =head1 DESCRIPTION
 
-This class implements the C<pantry create> command, which is used to create a new node data file
-in a pantry.
+This class implements the C<pantry strip> command, which is used to strip recipes or attributes
+from a node.
 
 =for Pod::Coverage options validate
 

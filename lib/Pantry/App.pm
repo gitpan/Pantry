@@ -2,19 +2,13 @@ use v5.14;
 use warnings;
 
 package Pantry::App;
-# ABSTRACT: Internal pantry application class
-our $VERSION = '0.001'; # VERSION
+# ABSTRACT: Internal pantry application superclass
+our $VERSION = '0.002'; # VERSION
 
-use App::Cmd::Setup 0.311 -app;
+use App::Cmd::Setup 0.317 -app;
 
 sub global_opt_spec {   # none yet, so just an empty stub
   return;
-}
-
-sub node_path {
-  my ($self, $name, $env) = @_;
-  $env //= '_default';
-  return "environments/${env}/${name}.json";
 }
 
 1;
@@ -27,13 +21,16 @@ __END__
 
 =head1 NAME
 
-Pantry::App - Internal pantry application class
+Pantry::App - Internal pantry application superclass
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
-=for Pod::Coverage node_path
+=head1 DESCRIPTION
+
+This class is the internal superclass for the Pantry application, containing
+any common data or methods.
 
 =head1 AUTHOR
 

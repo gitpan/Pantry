@@ -2,17 +2,16 @@ NAME
     Pantry - Configuration management tool for chef-solo
 
 VERSION
-    version 0.001
+    version 0.002
 
 SYNOPSIS
-    N.B. This program doesn't do much yet, but I'll expand this synopses
-    incrementally as features are added
-
       $ mkdir my-project
       $ cd my-project
       $ pantry init
       $ pantry create node foo.example.com
-      $ pantry edit node foo.example.com
+      $ pantry list nodes
+      $ pantry apply node foo.example.com --recipe nginx
+      $ pantry apply node foo.example.com --default nginx.port=80
       $ pantry sync node foo.example.com
 
 DESCRIPTION
@@ -27,27 +26,99 @@ USAGE
 
     See the following sections for details and examples by topic.
 
-  Pantry setup
+  Pantry setup and introspection
+   init
       $ pantry init
 
     This initializes a pantry in the current directory. Currently, it just
     creates some directories for use storing cookbooks, node data, etc.
 
+   list
+      $ pantry list nodes
+
+    Prints to STDOUT a list of nodes managed within the pantry.
+
   Managing nodes
+   create
       $ pantry create node NAME
 
     Creates a node configuration file for the given "NAME". The "NAME" must
     be a valid DNS name or IP address.
 
+   show
+      $ pantry show node NAME
+
+    Prints to STDOUT the JSON data for the given "NAME".
+
+   apply
+      $ pantry apply node NAME --recipe nginx --default nginx.port=80
+
+    Applies recipes or attributes to the given "NAME".
+
+    To apply a recipe to the node's "run_list", specify "--recipe RECIPE" or
+    "-r RECIPE". May be specified multiple times to apply more than one
+    recipe.
+
+    To apply an attribute to the node, specify "--default KEY=VALUE" or "-d
+    KEY=VALUE". If the "KEY" has components separated by periods ("."), they
+    will be interpreted as subkeys of a multi-level hash. For example:
+
+      $ pantry apply node NAME -d nginx.port=80
+
+    will be added to the node's data structure like this:
+
+      {
+        ... # other node data
+        nginx => {
+          port => 80
+        }
+      }
+
+    If the "VALUE" contains commas, the value will be split and serialized
+    as an array data structure. For example:
+
+      $ pantry apply node NAME -d nginx.port=80,8080
+
+    will be added to the node's data structure like this:
+
+      {
+        ... # other node data
+        nginx => {
+          port => [80, 8080]
+        }
+      }
+
+    Both "KEY" and "VALUE" support periods and commas (respectively) to be
+    escaped by a backslash.
+
+   strip
+      $ pantry strip node NAME --recipe nginx --default nginx.port
+
+    Strips recipes or attributes from the given "NAME".
+
+    To strip a recipe to the node's "run_list", specify "--recipe RECIPE" or
+    "-r RECIPE". May be specified multiple times to strip more than one
+    recipe.
+
+    To strip an attribute from the node, specify "--default KEY" or "-d
+    KEY". The "KEY" parameter is interpreted and may be escaped just like in
+    "apply", above.
+
+   sync
+      $ pantry sync node NAME
+
+    Copies cookbooks and configuration data to the "NAME" node and invokes
+    "chef-solo" via "ssh" to start a configuration run.
+
+   edit
       $ pantry edit node NAME
 
     Invokes the editor given by the environment variable "EDITOR" on the
     configuration file for the "name" node.
 
-      $ pantry sync node NAME
-
-    Copies cookbooks and configuration data to the "NAME" node and invokes
-    "chef-solo" via "ssh" to start a configuration run.
+    The resulting file must be valid JSON in a form acceptable to Chef.
+    Generally, you should use the "apply" or "strip" commands instead of
+    editing the node file directly.
 
 AUTHENTICATION
     "pantry" relies on OpenSSH for secure communications with managed nodes,
@@ -98,7 +169,7 @@ SEE ALSO
 SUPPORT
   Bugs / Feature Requests
     Please report any bugs or feature requests through the issue tracker at
-    <http://github.com/dagolden/Pantry/issues>. You will be notified
+    <https://github.com/dagolden/pantry/issues>. You will be notified
     automatically of any progress on your issue.
 
   Source Code

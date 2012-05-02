@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::sync;
 # ABSTRACT: Implements pantry sync subcommand
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -38,9 +38,6 @@ sub validate {
   if ( ! length $name ) {
     $self->usage_error( "This command requires the name for the thing to edit" );
   }
-  elsif ( ! -e $self->app->node_path($name) ) {
-    $self->usage_error( "Node '$name' does not exist" );
-  }
 
   return;
 }
@@ -63,6 +60,7 @@ my $rsync_opts = {
   verbose => 0, # XXX should trigger off a global option
   compress => 1,
   recursive => 1,
+  'delete' => 1,
   links => 1,
   times => 1,
 };
@@ -92,7 +90,8 @@ sub _process_node {
     or die "Could not rsync solo.rb\n";
   
   # rsync node JSON to remote /etc/chef/node.json
-  my $node_json = $self->app->node_path($name);
+  # XXX should really check to be sure it exists
+  my $node_json = $self->pantry->node($name)->path;
   $ssh->rsync_put($rsync_opts, $node_json, "/etc/chef/node.json")
     or die "Could not rsync node.json\n";
 
@@ -101,7 +100,9 @@ sub _process_node {
     or die "Could not rsync cookbooks\n";
 
   # ssh execute chef-solo
-  $ssh->system("chef-solo") # XXX eventually capture output
+  my $command = "chef-solo";
+  $command .= " -l debug" if $ENV{PANTRY_CHEF_DEBUG};
+  $ssh->system($command) # XXX eventually capture output
     or die "Error running chef-solo\n";
 
   # scp get run report
@@ -134,7 +135,16 @@ Pantry::App::Command::sync - Implements pantry sync subcommand
 
 =head1 VERSION
 
-version 0.001
+version 0.002
+
+=head1 SYNOPSIS
+
+  $ pantry sync node foo.example.com
+
+=head1 DESCRIPTION
+
+This class implements the C<pantry sync> command, which is used to rsync recipes
+and node data to a server and then run C<chef-solo> on the server to finish configuration.
 
 =for Pod::Coverage options validate
 

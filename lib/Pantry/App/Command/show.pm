@@ -1,21 +1,18 @@
 use v5.14;
 use warnings;
 
-package Pantry::App::Command::edit;
-# ABSTRACT: Implements pantry edit subcommand
+package Pantry::App::Command::show;
+# ABSTRACT: Implements pantry show subcommand
 our $VERSION = '0.002'; # VERSION
 
 use Pantry::App -command;
 use autodie;
-use File::Basename qw/dirname basename/;
 use File::Slurp qw/read_file/;
-use IPC::Cmd qw/can_run/;
-use JSON qw/decode_json/;
 
 use namespace::clean;
 
 sub abstract {
-  return 'edit items in a pantry (nodes, roles, etc.)';
+  return 'show items in a pantry (nodes, roles, etc.)';
 }
 
 sub options {
@@ -36,7 +33,7 @@ sub validate {
 
   # validate name
   if ( ! length $name ) {
-    $self->usage_error( "This command requires the name for the thing to edit" );
+    $self->usage_error( "This command requires the name for the thing to display" );
   }
 
   return;
@@ -47,16 +44,8 @@ sub execute {
 
   my ($type, $name) = splice(@$args, 0, 2);
 
-  my @editor = defined $ENV{EDITOR} ? split / /, $ENV{EDITOR} : ();
-  if ( @editor ) {
-    $editor[0] = can_run($editor[0]);
-  }
-
-  if ( @editor ) {
-    $self->_edit_file($name, @editor);
-  }
-  else {
-    $self->usage_error( "EDITOR not set or not found" );
+  if ($type eq 'node') {
+    $self->_show_node($name);
   }
 
   return;
@@ -66,20 +55,16 @@ sub execute {
 # Internal
 #--------------------------------------------------------------------------#
 
-sub _edit_file {
-  my ($self, $name, @editor) = @_;
+sub _show_node {
+  my ($self, $name) = @_;
   my $path = $self->pantry->node($name)->path;
   if ( -e $path ) {
-    system( @editor, $path ) and die "System failed!: $!";
-    eval { decode_json(read_file($path,{ binmode => ":raw" })) };
-    if ( my $err = $@ ) {
-      $err =~ s/, at .* line .*//;
-      warn "Warning: JSON errors in config for $name\n";
-    }
+    print scalar read_file($path);
   }
   else {
-    $self->usage_error("Node '$name' does not exist");
+    $self->usage_error( "Node '$name' does not exist" );
   }
+  return;
 }
 
 1;
@@ -92,7 +77,7 @@ __END__
 
 =head1 NAME
 
-Pantry::App::Command::edit - Implements pantry edit subcommand
+Pantry::App::Command::show - Implements pantry show subcommand
 
 =head1 VERSION
 
@@ -100,12 +85,12 @@ version 0.002
 
 =head1 SYNOPSIS
 
-  $ pantry edit node foo.example.com
+  $ pantry show node foo.example.com
 
 =head1 DESCRIPTION
 
-This class implements the C<pantry edit> command, which is used to open the node data
-JSON file in an editor for direct editing.
+This class implements the C<pantry show> command, which is used to
+display the JSON data for a node.
 
 =for Pod::Coverage options validate
 

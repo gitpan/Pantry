@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry;
 # ABSTRACT: Configuration management tool for chef-solo
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 # This file is a namespace placeholder and gives a default place to find
 # documentation for the 'pantry' program.
@@ -26,18 +26,17 @@ Pantry - Configuration management tool for chef-solo
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
-
-N.B. This program doesn't do much yet, but I'll expand this synopses
-incrementally as features are added
 
   $ mkdir my-project
   $ cd my-project
   $ pantry init
   $ pantry create node foo.example.com
-  $ pantry edit node foo.example.com
+  $ pantry list nodes
+  $ pantry apply node foo.example.com --recipe nginx
+  $ pantry apply node foo.example.com --default nginx.port=80
   $ pantry sync node foo.example.com
 
 =head1 DESCRIPTION
@@ -54,29 +53,107 @@ Arguments to the C<pantry> command line tool follow a regular structure:
 
 See the following sections for details and examples by topic.
 
-=head2 Pantry setup
+=head2 Pantry setup and introspection
+
+=head3 init
 
   $ pantry init
 
 This initializes a pantry in the current directory.  Currently, it just
 creates some directories for use storing cookbooks, node data, etc.
 
+=head3 list
+
+  $ pantry list nodes
+
+Prints to STDOUT a list of nodes managed within the pantry.
+
 =head2 Managing nodes
+
+=head3 create
 
   $ pantry create node NAME
 
 Creates a node configuration file for the given C<NAME>.  The C<NAME>
 must be a valid DNS name or IP address.
 
-  $ pantry edit node NAME
+=head3 show
 
-Invokes the editor given by the environment variable C<EDITOR> on
-the configuration file for the C<name> node.
+  $ pantry show node NAME
+
+Prints to STDOUT the JSON data for the given C<NAME>.
+
+=head3 apply
+
+  $ pantry apply node NAME --recipe nginx --default nginx.port=80
+
+Applies recipes or attributes to the given C<NAME>.
+
+To apply a recipe to the node's C<run_list>, specify C<--recipe RECIPE> or C<-r
+RECIPE>.  May be specified multiple times to apply more than one recipe.
+
+To apply an attribute to the node, specify C<--default KEY=VALUE> or C<-d
+KEY=VALUE>.  If the C<KEY> has components separated by periods (C<.>), they will
+be interpreted as subkeys of a multi-level hash.  For example:
+
+  $ pantry apply node NAME -d nginx.port=80
+
+will be added to the node's data structure like this:
+
+  {
+    ... # other node data
+    nginx => {
+      port => 80
+    }
+  }
+
+If the C<VALUE> contains commas, the value will be split and serialized as
+an array data structure.  For example:
+
+  $ pantry apply node NAME -d nginx.port=80,8080
+
+will be added to the node's data structure like this:
+
+  {
+    ... # other node data
+    nginx => {
+      port => [80, 8080]
+    }
+  }
+
+Both C<KEY> and C<VALUE> support periods and commas (respectively) to be
+escaped by a backslash.
+
+=head3 strip
+
+  $ pantry strip node NAME --recipe nginx --default nginx.port
+
+Strips recipes or attributes from the given C<NAME>.
+
+To strip a recipe to the node's C<run_list>, specify C<--recipe RECIPE> or C<-r
+RECIPE>.  May be specified multiple times to strip more than one recipe.
+
+To strip an attribute from the node, specify C<--default KEY> or C<-d KEY>.
+The C<KEY> parameter is interpreted and may be escaped just like in C<apply>,
+above.
+
+=head3 sync
 
   $ pantry sync node NAME
 
 Copies cookbooks and configuration data to the C<NAME> node and invokes
 C<chef-solo> via C<ssh> to start a configuration run.
+
+=head3 edit
+
+  $ pantry edit node NAME
+
+Invokes the editor given by the environment variable C<EDITOR> on
+the configuration file for the C<name> node.
+
+The resulting file must be valid JSON in a form acceptable to Chef.  Generally,
+you should use the C<apply> or C<strip> commands instead of editing the node
+file directly.
 
 =head1 AUTHENTICATION
 
@@ -131,14 +208,14 @@ L<pocketknife|https://github.com/igal/pocketknife> (Ruby)
 
 =back
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders
+=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests through the issue tracker
-at L<http://github.com/dagolden/Pantry/issues>.
+at L<https://github.com/dagolden/pantry/issues>.
 You will be notified automatically of any progress on your issue.
 
 =head2 Source Code

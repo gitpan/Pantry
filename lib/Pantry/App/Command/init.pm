@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::init;
 # ABSTRACT: Implements pantry init subcommand
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -44,6 +44,7 @@ sub execute {
 1;
 
 
+
 # vim: ts=2 sts=2 sw=2 et:
 
 __END__
@@ -55,7 +56,16 @@ Pantry::App::Command::init - Implements pantry init subcommand
 
 =head1 VERSION
 
-version 0.001
+version 0.002
+
+=head1 SYNOPSIS
+
+  $ pantry init
+
+=head1 DESCRIPTION
+
+This class implements the C<pantry init> command, which creates subdirectories needed for
+correct pantry operation.
 
 =for Pod::Coverage options validate
 
