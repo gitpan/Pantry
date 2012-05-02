@@ -32,6 +32,7 @@ t/app/create/node.t
 t/app/edit/node.t
 t/app/init/dir.t
 t/app/init/nondestructive.t
+t/app/list/node.t
 t/app/options.t
 t/app/show/node.t
 t/app/strip/node.t

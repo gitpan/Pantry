@@ -1,5 +1,11 @@
 Revision history for pantry
 
+0.003     2012-05-02 18:06:55 America/New_York
+
+    [Fixed]
+
+    - 'pantry list' now lists node *names* not *filenames*
+
 0.002     2012-05-02 17:15:46 America/New_York
 
     [Added]

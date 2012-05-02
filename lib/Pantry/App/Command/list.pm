@@ -3,11 +3,10 @@ use warnings;
 
 package Pantry::App::Command::list;
 # ABSTRACT: Implements pantry list subcommand
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use Pantry::App -command;
 use autodie;
-use Path::Class::Rule;
 
 use namespace::clean;
 
@@ -25,7 +24,7 @@ sub validate {
 
   # validate type
   if ( ! length $type ) {
-    $self->usage_error( "This command requires a target type and name" );
+    $self->usage_error( "This command requires a target type" );
   }
   elsif ( $type !~ /nodes?/ ) {
     $self->usage_error( "Invalid type '$type'" );
@@ -50,8 +49,7 @@ sub execute {
 
 sub _list_node {
   my ($self) = @_;
-  my $pcr = Path::Class::Rule->new->file->name("*.json");
-  say $_->basename for $pcr->all("environments/_default");
+  say $_ for $self->pantry->all_nodes;
 }
 1;
 
@@ -68,7 +66,7 @@ Pantry::App::Command::list - Implements pantry list subcommand
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

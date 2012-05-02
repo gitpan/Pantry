@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry;
 # ABSTRACT: Configuration management tool for chef-solo
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 # This file is a namespace placeholder and gives a default place to find
 # documentation for the 'pantry' program.
@@ -26,7 +26,7 @@ Pantry - Configuration management tool for chef-solo
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ NAME
     Pantry - Configuration management tool for chef-solo
 
 VERSION
-    version 0.002
+    version 0.003
 
 SYNOPSIS
       $ mkdir my-project

@@ -3,13 +3,14 @@ use warnings;
 
 package Pantry::Model::Pantry;
 # ABSTRACT: Pantry data model for a pantry directory
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use Moose 2;
 use MooseX::Types::Path::Class::MoreCoercions 0.002 qw/AbsDir/;
 use namespace::autoclean;
 
 use Path::Class;
+use Path::Class::Rule;
 
 
 has path => (
@@ -19,10 +20,25 @@ has path => (
   default => sub { dir(".")->absolute }
 );
 
+sub _env_path {
+  my ($self, $env) = @_;
+  $env //= '_default';
+  my $path = $self->path->subdir("environments", $env);
+  $path->mkpath;
+  return $path;
+}
+
 sub _node_path {
   my ($self, $node_name, $env) = @_;
-  $env //= '_default';
-  return $self->path->file("environments/${env}/${node_name}.json");
+  return $self->_env_path($env)->file("${node_name}.json");
+}
+
+
+sub all_nodes {
+  my ($self, $env) = @_;
+  my @nodes = map { s/\.json$//r } map { $_->basename }
+              $self->_env_path($env)->children;
+  return @nodes;
 }
 
 
@@ -51,7 +67,7 @@ Pantry::Model::Pantry - Pantry data model for a pantry directory
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -70,6 +86,13 @@ Chef Solo by Opscode.
 Path to the pantry directory. Defaults to the current directory.
 
 =head1 METHODS
+
+=head2 all_nodes
+
+  my @nodes = $pantry->all_nodes;
+
+In list context, returns a list of nodes.  In scalar context, returns
+a count of nodes.
 
 =head2 C<node>
 

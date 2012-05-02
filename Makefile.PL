@@ -54,9 +54,9 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
-    "TESTS" => "t/*.t t/app/*.t t/app/apply/*.t t/app/create/*.t t/app/edit/*.t t/app/init/*.t t/app/show/*.t t/app/strip/*.t t/model/*.t"
+    "TESTS" => "t/*.t t/app/*.t t/app/apply/*.t t/app/create/*.t t/app/edit/*.t t/app/init/*.t t/app/list/*.t t/app/show/*.t t/app/strip/*.t t/model/*.t"
   }
 );
 
