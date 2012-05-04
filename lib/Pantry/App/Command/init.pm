@@ -3,31 +3,24 @@ use warnings;
 
 package Pantry::App::Command::init;
 # ABSTRACT: Implements pantry init subcommand
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use Pantry::App -command;
 use autodie;
 
 sub abstract {
-  return 'initialize a pantry in the current directory';
-}
-
-sub options {
-  return;
-}
-
-sub validate {
-  return;
+  return 'Initialize a pantry in the current directory';
 }
 
 my @pantry_dirs = qw(
   cookbooks
-  roles
   environments
+  reports
+  roles
 );
 
-sub execute {
-  my ($self, $opt, $args) = @_;
+sub _init {
+  my ($self, $opt) = @_;
 
   for my $d ( @pantry_dirs ) {
     if ( -d $d ) {
@@ -56,7 +49,7 @@ Pantry::App::Command::init - Implements pantry init subcommand
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

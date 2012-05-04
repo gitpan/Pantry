@@ -1,8 +1,8 @@
 use v5.14;
 use warnings;
 
-package Pantry::App::Command::create;
-# ABSTRACT: Implements pantry create subcommand
+package Pantry::App::Command::rename;
+# ABSTRACT: Implements pantry rename subcommand
 our $VERSION = '0.004'; # VERSION
 
 use Pantry::App -command;
@@ -11,26 +11,31 @@ use autodie;
 use namespace::clean;
 
 sub abstract {
-  return 'Create items in a pantry (nodes, roles, etc.)';
+  return 'Rename an item in a pantry (nodes, roles, etc.)';
 }
 
 sub command_type {
-  return 'CREATE';
+  return 'DUAL_TARGET';
 }
 
 sub valid_types {
   return qw/node/
 }
 
-sub _create_node {
-  my ($self, $opt, $name) = @_;
+sub _rename_node{
+  my ($self, $opt, $name, $dest) = @_;
 
   my $node = $self->pantry->node( $name );
-  if ( -e $node->path ) {
-    $self->usage_error( "Node '$name' already exists" );
+  my $dest_path = $self->pantry->node( $dest )->path;
+  if ( ! -e $node->path ) {
+    die( "Node '$name' doesn't exist\n" );
+  }
+  elsif ( -e $dest_path ) {
+    die( "Node '$dest' already exists. Won't over-write it.\n" );
   }
   else {
-    $node->save;
+    $node->save_as( $dest_path );
+    unlink $node->path;
   }
 
   return;
@@ -46,7 +51,7 @@ __END__
 
 =head1 NAME
 
-Pantry::App::Command::create - Implements pantry create subcommand
+Pantry::App::Command::rename - Implements pantry rename subcommand
 
 =head1 VERSION
 

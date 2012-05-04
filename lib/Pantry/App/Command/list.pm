@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::list;
 # ABSTRACT: Implements pantry list subcommand
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -11,46 +11,24 @@ use autodie;
 use namespace::clean;
 
 sub abstract {
-  return 'list information about pantry contents';
+  return 'List pantry objects of a particular type';
 }
 
-sub options {
-  return;
+sub command_type {
+  return 'TYPE';
 }
 
-sub validate {
-  my ($self, $opts, $args) = @_;
-  my ($type) = @$args;
-
-  # validate type
-  if ( ! length $type ) {
-    $self->usage_error( "This command requires a target type" );
-  }
-  elsif ( $type !~ /nodes?/ ) {
-    $self->usage_error( "Invalid type '$type'" );
-  }
-
-  return;
+sub valid_types {
+  return qw/node nodes/
 }
 
-sub execute {
-  my ($self, $opt, $args) = @_;
-
-  my ($type) = shift @$args;
-
-  $self->_list_node;
-
-  return;
-}
-
-#--------------------------------------------------------------------------#
-# Internal
-#--------------------------------------------------------------------------#
-
-sub _list_node {
-  my ($self) = @_;
+sub _list_nodes {
+  my ($self, $opt) = @_;
   say $_ for $self->pantry->all_nodes;
 }
+
+*_list_node = *_list_nodes; # alias
+
 1;
 
 
@@ -66,7 +44,7 @@ Pantry::App::Command::list - Implements pantry list subcommand
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

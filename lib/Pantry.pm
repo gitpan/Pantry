@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry;
 # ABSTRACT: Configuration management tool for chef-solo
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 # This file is a namespace placeholder and gives a default place to find
 # documentation for the 'pantry' program.
@@ -26,7 +26,7 @@ Pantry - Configuration management tool for chef-solo
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -43,7 +43,7 @@ version 0.003
 
 C<pantry> is a utility to make it easier to manage a collection of
 computers with the configuration management tool
-L<chef-solo|http://wiki.opscode.com/display/chef/Chef+Solo>
+chef-solo L<http://wiki.opscode.com/display/chef/Chef+Solo>
 
 =head1 USAGE
 
@@ -70,12 +70,39 @@ Prints to STDOUT a list of nodes managed within the pantry.
 
 =head2 Managing nodes
 
+In this section, when a node NAME is required, the name is
+expected to be a valid DNS name or IP address.  The name
+will be converted to lowercase for consistency.
+
+Also, whenever a command takes a single 'node NAME' target,
+you may give a single dash ('-') as the NAME and the command
+will be run against a list of nodes read from STDIN.
+
+You can combine this with the C<pantry list> command to do
+batch operations.  For example, to sync all nodes:
+
+  $ pantry list nodes | pantry sync node -
+
 =head3 create
 
   $ pantry create node NAME
 
-Creates a node configuration file for the given C<NAME>.  The C<NAME>
-must be a valid DNS name or IP address.
+Creates a node configuration file for the given C<NAME>.
+
+=head3 rename
+
+  $ pantry rename node NAME DESTINATION
+
+Renames a node to a new name.  The old node data file
+is renamed.  The C<NAME> must exist.
+
+=head3 delete 
+
+  $ pantry delete node NAME
+
+Deletes a node. The C<NAME> must exist. Unless the C<--force>
+or C<-f> options are given, the user will be prompted to confirm
+deletion.
 
 =head3 show
 
@@ -142,7 +169,9 @@ above.
   $ pantry sync node NAME
 
 Copies cookbooks and configuration data to the C<NAME> node and invokes
-C<chef-solo> via C<ssh> to start a configuration run.
+C<chef-solo> via C<ssh> to start a configuration run.  After configuration,
+the latest run-report for the node is updated in the 'reports' directory
+of the pantry.
 
 =head3 edit
 
@@ -154,6 +183,21 @@ the configuration file for the C<name> node.
 The resulting file must be valid JSON in a form acceptable to Chef.  Generally,
 you should use the C<apply> or C<strip> commands instead of editing the node
 file directly.
+
+=head2 Getting help
+
+=head3 commands
+
+  $ pantry commands
+
+This gives a list of all pantry commands with a short description of each.
+
+=head3 help
+
+  $ pantry help COMMAND
+
+This gives some detailed help for a command, including the options and
+arguments that may be used.
 
 =head1 AUTHENTICATION
 
@@ -189,6 +233,45 @@ C<ssh-add>:
 See the documentation for C<ssh-add> for control over how long keys
 stay unlocked.
 
+=head1 ROADMAP
+
+In the future, I hope to extend pantry to support some or all of the following:
+
+=over 4
+
+=item *
+
+Chef role creation and application
+
+=item *
+
+environments
+
+=item *
+
+tagging nodes
+
+=item *
+
+searching nodes based on configuration
+
+=item *
+
+data bags
+
+=item *
+
+cookbook download from Opscode community repository
+
+=item *
+
+bootstrapping Chef over ssh
+
+=back
+
+If you are interested in contributing features or bug fixes, please let me
+know!
+
 =head1 SEE ALSO
 
 Inspiration for this tool came from similar chef-solo management tools.
@@ -200,11 +283,11 @@ Nevertheless, if you use chef-solo, you might consider them as well:
 
 =item *
 
-L<littlechef|https://github.com/tobami/littlechef> (Python)
+littlechef L<http://github.com/tobami/littlechef> (Python)
 
 =item *
 
-L<pocketknife|https://github.com/igal/pocketknife> (Ruby)
+pocketknife L<http://github.com/igal/pocketknife> (Ruby)
 
 =back
 

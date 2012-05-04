@@ -13,9 +13,11 @@ lib/Pantry/App.pm
 lib/Pantry/App/Command.pm
 lib/Pantry/App/Command/apply.pm
 lib/Pantry/App/Command/create.pm
+lib/Pantry/App/Command/delete.pm
 lib/Pantry/App/Command/edit.pm
 lib/Pantry/App/Command/init.pm
 lib/Pantry/App/Command/list.pm
+lib/Pantry/App/Command/rename.pm
 lib/Pantry/App/Command/show.pm
 lib/Pantry/App/Command/strip.pm
 lib/Pantry/App/Command/sync.pm
@@ -29,11 +31,14 @@ perlcritic.rc
 t/00-compile.t
 t/app/apply/node.t
 t/app/create/node.t
+t/app/delete/node.t
 t/app/edit/node.t
+t/app/help.t
 t/app/init/dir.t
 t/app/init/nondestructive.t
 t/app/list/node.t
 t/app/options.t
+t/app/rename/node.t
 t/app/show/node.t
 t/app/strip/node.t
 t/lib/TestHelper.pm

@@ -8,6 +8,7 @@ our @EXPORT = qw(
   _thaw_file
   _dump_node
   _try_command
+  _create_pantry
   _create_node
 );
 
@@ -48,19 +49,27 @@ sub _try_command {
   return $result;
 }
 
-sub _create_node {
+sub _create_pantry {
   my $wd = tempd;
   _try_command(qw(init));
-  _try_command(qw(create node foo.example.com));
-
   my $pantry = Pantry::Model::Pantry->new( path => "$wd" );
-  my $node = $pantry->node("foo.example.com");
+  return ($wd, $pantry);
+}
+
+sub _create_node {
+  my ($name) = @_;
+  $name //= 'foo.example.com';
+  my ($wd, $pantry) = _create_pantry;
+
+  _try_command(qw(create node), $name);
+
+  my $node = $pantry->node($name);
   if ( -e $node->path ) {
     pass("test node file found");
   }
   else {
     fail("test node file found");
-    diag("node foo.example.com not found at " . $node->path);
+    diag("node $name not found at " . $node->path);
     diag("bailing out of rest of the subtest");
     return;
   }

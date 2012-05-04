@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::edit;
 # ABSTRACT: Implements pantry edit subcommand
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -15,37 +15,19 @@ use JSON qw/decode_json/;
 use namespace::clean;
 
 sub abstract {
-  return 'edit items in a pantry (nodes, roles, etc.)';
+  return 'Edit items in a pantry (nodes, roles, etc.)';
 }
 
-sub options {
-  return;
+sub command_type {
+  return 'TARGET';
 }
 
-sub validate {
-  my ($self, $opts, $args) = @_;
-  my ($type, $name) = @$args;
-
-  # validate type
-  if ( ! length $type ) {
-    $self->usage_error( "This command requires a target type and name" );
-  }
-  elsif ( $type ne 'node' ) {
-    $self->usage_error( "Invalid type '$type'" );
-  }
-
-  # validate name
-  if ( ! length $name ) {
-    $self->usage_error( "This command requires the name for the thing to edit" );
-  }
-
-  return;
+sub valid_types {
+  return qw/node/
 }
 
-sub execute {
-  my ($self, $opt, $args) = @_;
-
-  my ($type, $name) = splice(@$args, 0, 2);
+sub _edit_node {
+  my ($self, $opt, $name) = @_;
 
   my @editor = defined $ENV{EDITOR} ? split / /, $ENV{EDITOR} : ();
   if ( @editor ) {
@@ -96,7 +78,7 @@ Pantry::App::Command::edit - Implements pantry edit subcommand
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

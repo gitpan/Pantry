@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::strip;
 # ABSTRACT: Implements pantry strip subcommand
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -11,56 +11,41 @@ use autodie;
 use namespace::clean;
 
 sub abstract {
-  return 'strip recipes or attributes from a node'
+  return 'Strip recipes or attributes from a node'
+}
+
+sub command_type {
+  return 'TARGET';
+}
+
+sub valid_types {
+  return qw/node/
 }
 
 sub options {
-  return;
+  my ($self) = @_;
+  return $self->data_options;
 }
 
-sub validate {
-  my ($self, $opts, $args) = @_;
-  my ($type, $name) = @$args;
+sub _strip_node {
+  my ($self, $opt, $name) = @_;
 
-  # validate type
-  if ( ! length $type ) {
-    $self->usage_error( "This command requires a target type and name" );
-  }
-  elsif ( $type ne 'node' ) {
-    $self->usage_error( "Invalid type '$type'" );
+  my $node = $self->pantry->node( $name )
+    or $self->usage_error( "Node '$name' does not exist" );
+
+  if ($opt->{recipe}) {
+    $node->remove_from_run_list(map { "recipe[$_]" } @{$opt->{recipe}});
   }
 
-  # validate name
-  if ( ! length $name ) {
-    $self->usage_error( "This command requires the name for the thing to modify" );
-  }
-
-  return;
-}
-
-sub execute {
-  my ($self, $opt, $args) = @_;
-
-  my ($type, $name) = splice(@$args, 0, 2);
-
-  if ( $type eq 'node' ) {
-    my $node = $self->pantry->node( $name )
-      or $self->usage_error( "Node '$name' does not exist" );
-
-    if ($opt->{recipe}) {
-      $node->remove_from_run_list(map { "recipe[$_]" } @{$opt->{recipe}});
+  if ($opt->{default}) {
+    for my $attr ( @{ $opt->{default} } ) {
+      my ($key, $value) = split /=/, $attr, 2; # split on first '='
+      # if they gave a value, we ignore it
+      $node->delete_attribute($key);
     }
-
-    if ($opt->{default}) {
-      for my $attr ( @{ $opt->{default} } ) {
-        my ($key, $value) = split /=/, $attr, 2; # split on first '='
-        # if they gave a value, we ignore it
-        $node->delete_attribute($key);
-      }
-    }
-
-    $node->save;
   }
+
+  $node->save;
 
   return;
 }
@@ -79,7 +64,7 @@ Pantry::App::Command::strip - Implements pantry strip subcommand
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

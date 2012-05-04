@@ -37,6 +37,7 @@ my %WriteMakefileArgs = (
     "File::Path" => 0,
     "File::Slurp" => 0,
     "File::Temp" => "0.22",
+    "IO::Prompt::Tiny" => 0,
     "IPC::Cmd" => 0,
     "JSON" => 2,
     "List::AllUtils" => 0,
@@ -54,9 +55,9 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
-    "TESTS" => "t/*.t t/app/*.t t/app/apply/*.t t/app/create/*.t t/app/edit/*.t t/app/init/*.t t/app/list/*.t t/app/show/*.t t/app/strip/*.t t/model/*.t"
+    "TESTS" => "t/*.t t/app/*.t t/app/apply/*.t t/app/create/*.t t/app/delete/*.t t/app/edit/*.t t/app/init/*.t t/app/list/*.t t/app/rename/*.t t/app/show/*.t t/app/strip/*.t t/model/*.t"
   }
 );
 

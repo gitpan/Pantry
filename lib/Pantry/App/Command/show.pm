@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::show;
 # ABSTRACT: Implements pantry show subcommand
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -12,51 +12,19 @@ use File::Slurp qw/read_file/;
 use namespace::clean;
 
 sub abstract {
-  return 'show items in a pantry (nodes, roles, etc.)';
+  return 'Show items in a pantry (nodes, roles, etc.)';
 }
 
-sub options {
-  return;
+sub command_type {
+  return 'TARGET';
 }
 
-sub validate {
-  my ($self, $opts, $args) = @_;
-  my ($type, $name) = @$args;
-
-  # validate type
-  if ( ! length $type ) {
-    $self->usage_error( "This command requires a target type and name" );
-  }
-  elsif ( $type ne 'node' ) {
-    $self->usage_error( "Invalid type '$type'" );
-  }
-
-  # validate name
-  if ( ! length $name ) {
-    $self->usage_error( "This command requires the name for the thing to display" );
-  }
-
-  return;
+sub valid_types {
+  return qw/node/
 }
-
-sub execute {
-  my ($self, $opt, $args) = @_;
-
-  my ($type, $name) = splice(@$args, 0, 2);
-
-  if ($type eq 'node') {
-    $self->_show_node($name);
-  }
-
-  return;
-}
-
-#--------------------------------------------------------------------------#
-# Internal
-#--------------------------------------------------------------------------#
 
 sub _show_node {
-  my ($self, $name) = @_;
+  my ($self, $opt, $name) = @_;
   my $path = $self->pantry->node($name)->path;
   if ( -e $path ) {
     print scalar read_file($path);
@@ -81,7 +49,7 @@ Pantry::App::Command::show - Implements pantry show subcommand
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

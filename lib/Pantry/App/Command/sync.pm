@@ -3,11 +3,12 @@ use warnings;
 
 package Pantry::App::Command::sync;
 # ABSTRACT: Implements pantry sync subcommand
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use Pantry::App -command;
 use autodie;
 use Net::OpenSSH;
+use Path::Class;
 use File::Temp 0.22 qw/tempfile/;
 
 Net::OpenSSH->VERSION("0.56_01");
@@ -15,46 +16,16 @@ Net::OpenSSH->VERSION("0.56_01");
 use namespace::clean;
 
 sub abstract {
-  return 'run chef-solo on remote node';
+  return 'Run chef-solo on remote node';
 }
 
-sub options {
-  return;
+sub command_type {
+  return 'TARGET';
 }
 
-sub validate {
-  my ($self, $opts, $args) = @_;
-  my ($type, $name) = @$args;
-
-  # validate type
-  if ( ! length $type ) {
-    $self->usage_error( "This command requires a target type and name" );
-  }
-  elsif ( $type ne 'node' ) {
-    $self->usage_error( "Invalid type '$type'" );
-  }
-
-  # validate name
-  if ( ! length $name ) {
-    $self->usage_error( "This command requires the name for the thing to edit" );
-  }
-
-  return;
+sub valid_types {
+  return qw/node/
 }
-
-sub execute {
-  my ($self, $opt, $args) = @_;
-
-  my ($type, $name) = splice(@$args, 0, 2);
-
-  $self->_process_node($name);
-
-  return;
-}
-
-#--------------------------------------------------------------------------#
-# Internal
-#--------------------------------------------------------------------------#
 
 my $rsync_opts = {
   verbose => 0, # XXX should trigger off a global option
@@ -65,8 +36,8 @@ my $rsync_opts = {
   times => 1,
 };
 
-sub _process_node {
-  my ($self, $name) = @_;
+sub _sync_node {
+  my ($self, $opt, $name) = @_;
 
   say "Synchronizing $name";
 
@@ -88,10 +59,10 @@ sub _process_node {
   close $fh;
   $ssh->rsync_put($rsync_opts, $solo_rb, "/etc/chef/solo.rb")
     or die "Could not rsync solo.rb\n";
-  
+
   # rsync node JSON to remote /etc/chef/node.json
   # XXX should really check to be sure it exists
-  my $node_json = $self->pantry->node($name)->path;
+  my $node_json = $self->pantry->node($name)->path->stringify;
   $ssh->rsync_put($rsync_opts, $node_json, "/etc/chef/node.json")
     or die "Could not rsync node.json\n";
 
@@ -107,6 +78,12 @@ sub _process_node {
 
   # scp get run report
   # NOT IMPLEMENTED YET
+  my $report = $ssh->capture("ls -t /var/chef-solo/reports | head -1");
+  chomp $report;
+  # XXX should check that the report timestamp makes sense -- xdg, 2012-05-03
+
+  dir("reports")->mkpath;
+  $ssh->rsync_get($rsync_opts, "/var/chef-solo/reports/$report", "reports/$name");
 
 }
 
@@ -135,7 +112,7 @@ Pantry::App::Command::sync - Implements pantry sync subcommand
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

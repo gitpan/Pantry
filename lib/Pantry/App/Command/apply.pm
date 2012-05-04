@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::apply;
 # ABSTRACT: Implements pantry apply subcommand
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -11,61 +11,43 @@ use autodie;
 use namespace::clean;
 
 sub abstract {
-  return 'apply recipes or attributes to a node'
+  return 'Apply recipes or attributes to a node'
+}
+
+sub command_type {
+  return 'TARGET';
 }
 
 sub options {
-  return;
+  my ($self) = @_;
+  return $self->data_options;
 }
 
-sub validate {
-  my ($self, $opts, $args) = @_;
-  my ($type, $name) = @$args;
-
-  # validate type
-  if ( ! length $type ) {
-    $self->usage_error( "This command requires a target type and name" );
-  }
-  elsif ( $type ne 'node' ) {
-    $self->usage_error( "Invalid type '$type'" );
-  }
-
-  # validate name
-  if ( ! length $name ) {
-    $self->usage_error( "This command requires the name for the thing to modify" );
-  }
-
-  return;
+sub valid_types {
+  return qw/node/
 }
 
-sub execute {
-  my ($self, $opt, $args) = @_;
+sub _apply_node {
+  my ($self, $opt, $name) = @_;
+  my $node = $self->pantry->node( $name )
+    or $self->usage_error( "Node '$name' does not exist" );
 
-  my ($type, $name) = splice(@$args, 0, 2);
+  if ($opt->{recipe}) {
+    $node->append_to_run_list(map { "recipe[$_]" } @{$opt->{recipe}});
+  }
 
-  if ( $type eq 'node' ) {
-    my $node = $self->pantry->node( $name )
-      or $self->usage_error( "Node '$name' does not exist" );
-
-    if ($opt->{recipe}) {
-      $node->append_to_run_list(map { "recipe[$_]" } @{$opt->{recipe}});
-    }
-
-    if ($opt->{default}) {
-      for my $attr ( @{ $opt->{default} } ) {
-        my ($key, $value) = split /=/, $attr, 2; # split on first '='
-        if ( $value =~ /(?<!\\),/ ) {
-          # split on unescaped commas, then unescape escaped commas
-          $value = [ map { s/\\,/,/gr } split /(?<!\\),/, $value ];
-        }
-        $node->set_attribute($key, $value);
+  if ($opt->{default}) {
+    for my $attr ( @{ $opt->{default} } ) {
+      my ($key, $value) = split /=/, $attr, 2; # split on first '='
+      if ( $value =~ /(?<!\\),/ ) {
+        # split on unescaped commas, then unescape escaped commas
+        $value = [ map { s/\\,/,/gr } split /(?<!\\),/, $value ];
       }
+      $node->set_attribute($key, $value);
     }
-
-    $node->save;
   }
 
-  return;
+  $node->save;
 }
 
 1;
@@ -82,7 +64,7 @@ Pantry::App::Command::apply - Implements pantry apply subcommand
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
