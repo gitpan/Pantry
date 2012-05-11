@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::show;
 # ABSTRACT: Implements pantry show subcommand
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -20,17 +20,25 @@ sub command_type {
 }
 
 sub valid_types {
-  return qw/node/
+  return qw/node role/
 }
 
 sub _show_node {
   my ($self, $opt, $name) = @_;
-  my $path = $self->pantry->node($name)->path;
+  return $self->_show_obj($opt, 'node', $name);
+}
+
+sub _show_role {
+  my ($self, $opt, $name) = @_;
+  return $self->_show_obj($opt, 'role', $name);
+}
+
+sub _show_obj {
+  my ($self, $opt, $type, $name) = @_;
+  my $obj = $self->_check_name($type, $name);
+  my $path = $obj->path;
   if ( -e $path ) {
     print scalar read_file($path);
-  }
-  else {
-    $self->usage_error( "Node '$name' does not exist" );
   }
   return;
 }
@@ -49,7 +57,7 @@ Pantry::App::Command::show - Implements pantry show subcommand
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

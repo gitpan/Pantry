@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::Model::Pantry;
 # ABSTRACT: Pantry data model for a pantry directory
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use Moose 2;
 use MooseX::Types::Path::Class::MoreCoercions 0.002 qw/AbsDir/;
@@ -20,7 +20,7 @@ has path => (
   default => sub { dir(".")->absolute }
 );
 
-sub _env_path {
+sub _env_dir {
   my ($self, $env) = @_;
   $env //= '_default';
   my $path = $self->path->subdir("environments", $env);
@@ -28,16 +28,28 @@ sub _env_path {
   return $path;
 }
 
+sub _role_dir {
+  my ($self) = @_;
+  my $path = $self->path->subdir("roles");
+  $path->mkpath;
+  return $path;
+}
+
+sub _role_path {
+  my ($self, $role_name) = @_;
+  return $self->_role_dir->file("${role_name}.json");
+}
+
 sub _node_path {
   my ($self, $node_name, $env) = @_;
-  return $self->_env_path($env)->file("${node_name}.json");
+  return $self->_env_dir($env)->file("${node_name}.json");
 }
 
 
 sub all_nodes {
   my ($self, $env) = @_;
   my @nodes = sort map { s/\.json$//r } map { $_->basename }
-              $self->_env_path($env)->children;
+              $self->_env_dir($env)->children;
   return @nodes;
 }
 
@@ -55,6 +67,40 @@ sub node {
   }
 }
 
+
+sub find_node {
+  my ($self, $pattern) = @_;
+  return map { $self->node($_) } grep { $_ =~ /^\Q$pattern\E/ } $self->all_nodes;
+}
+
+
+sub all_roles {
+  my ($self, $env) = @_;
+  my @roles = sort map { s/\.json$//r } map { $_->basename }
+              $self->_role_dir->children;
+  return @roles;
+}
+
+
+sub role {
+  my ($self, $role_name, $env) = @_;
+  $role_name = lc $role_name;
+  require Pantry::Model::Role;
+  my $path = $self->_role_path( $role_name );
+  if ( -e $path ) {
+    return Pantry::Model::Role->new_from_file( $path );
+  }
+  else {
+    return Pantry::Model::Role->new( name => $role_name, _path => $path );
+  }
+}
+
+
+sub find_role {
+  my ($self, $pattern) = @_;
+  return map { $self->role($_) } grep { $_ =~ /^\Q$pattern\E/ } $self->all_roles;
+}
+
 1;
 
 
@@ -68,7 +114,7 @@ Pantry::Model::Pantry - Pantry data model for a pantry directory
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -102,6 +148,40 @@ a count of nodes.
 Returns a L<Pantry::Model::Node> object corresponding to the given node.
 If the node exists in the pantry, it will be loaded from the saved node file.
 Otherwise, it will be created in memory (but will not be persisted to disk).
+
+=head2 find_node
+
+  my @nodes = $pantry->find_node( $leading_part );
+
+Finds one or more node matching a leading part.  For example, given
+nodes 'foo.example.com' and 'bar.example.com' in a pantry, use
+C<<$pantry->find_node("foo")>> to get 'foo.example.com'.
+
+Returns a list of node objects if any are found.
+
+=head2 all_roles
+
+  my @roles = $pantry->all_roles;
+
+In list context, returns a list of roles.  In scalar context, returns
+a count of roles.
+
+=head2 C<role>
+
+  my $node = $pantry->role("web");
+
+Returns a L<Pantry::Model::Role> object corresponding to the given role.
+If the role exists in the pantry, it will be loaded from the saved role file.
+Otherwise, it will be created in memory (but will not be persisted to disk).
+
+=head2 find_role
+
+  my @roles = $pantry->find_role( $leading_part );
+
+Finds one or more role matching a leading part.  For example, given roles 'web'
+and 'mysql' in a pantry, use C<<$pantry->find_role("my")>> to get 'mysql'.
+
+Returns a list of role objects if any are found.
 
 =head1 AUTHOR
 

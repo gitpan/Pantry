@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command;
 # ABSTRACT: Pantry command superclass
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use App::Cmd::Setup -command;
 
@@ -141,6 +141,7 @@ The TYPE parameter indicates what kind of pantry object to list.
 Valid types include:
 
         node, nodes   lists nodes
+        role, roles   lists roles
 HERE
   },
   TARGET => {
@@ -154,6 +155,7 @@ indicates which specific one. (e.g. "node foo.example.com")
 Valid TARGET types include:
 
         node      NAME refers to a node name in the pantry
+        role      NAME refers to a role name in the pantry
 
 If NAME is '-', then the command will be executed on a list of names
 read from STDIN.
@@ -170,6 +172,7 @@ indicates which specific one. (e.g. "node foo.example.com")
 Valid TARGET types include:
 
         node      NAME refers to a node name in the pantry
+        role      NAME refers to a role name in the pantry
 
 The DESTINATION parameter indicates where the NAME should be put.
 HERE
@@ -185,6 +188,7 @@ indicates which specific one. (e.g. "node foo.example.com")
 Valid TARGET types include:
 
         node      NAME refers to a node name that is *NOT* in the pantry
+        role      NAME refers to a role name that is *NOT* in the pantry
 
 If NAME is '-', then the command will be executed on a list of names
 read from STDIN.
@@ -222,9 +226,26 @@ HERE
 
 sub data_options {
   return (
-    [ 'recipe|r=s@' => "A recipe (without 'recipe[...]')" ],
-    [ 'default|d=s@' => "Default attribute (as KEY or KEY=VALUE)" ],
+    [ 'recipe|r=s@'   => "A recipe (without 'recipe[...]')" ],
+    [ 'role|R=s@'     => "A role (without 'role[...]')" ],
+    [ 'default|d=s@'  => "Default attribute (as KEY or KEY=VALUE)" ],
+    [ 'override=s@'   => "Override attribute (as KEY or KEY=VALUE) (roles only)" ],
   );
+}
+
+sub _check_name {
+  my ($self, $type, $name) = @_;
+  my $meth = "find_$type";
+  my @objs = $self->pantry->$meth( $name );
+  if (@objs == 0) {
+    die "$type '$name' does not exist\n";
+  }
+  elsif ( @objs == 1 ) {
+    return $objs[0];
+  }
+  else {
+    die join("\n", "$type '$name' is ambiguous:", (map { "  " . $_->name } @objs), "");
+  }
 }
 
 1;
@@ -241,7 +262,7 @@ Pantry::App::Command - Pantry command superclass
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 

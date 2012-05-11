@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::apply;
 # ABSTRACT: Implements pantry apply subcommand
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -11,7 +11,7 @@ use autodie;
 use namespace::clean;
 
 sub abstract {
-  return 'Apply recipes or attributes to a node'
+  return 'Apply recipes or attributes to a node or role'
 }
 
 sub command_type {
@@ -24,31 +24,77 @@ sub options {
 }
 
 sub valid_types {
-  return qw/node/
+  return qw/node role/
 }
 
 sub _apply_node {
   my ($self, $opt, $name) = @_;
-  my $node = $self->pantry->node( $name )
-    or $self->usage_error( "Node '$name' does not exist" );
+  $self->_apply_obj($opt, 'node', $name);
+}
 
-  if ($opt->{recipe}) {
-    $node->append_to_run_list(map { "recipe[$_]" } @{$opt->{recipe}});
+sub _apply_role {
+  my ($self, $opt, $name) = @_;
+  $self->_apply_obj($opt, 'role', $name);
+}
+
+my %setters = (
+  node => {
+    default => 'set_attribute',
+    override => undef,
+  },
+  role => {
+    default => 'set_default_attribute',
+    override => 'set_override_attribute',
+  },
+);
+
+sub _apply_obj {
+  my ($self, $opt, $type, $name) = @_;
+
+  my $obj = $self->_check_name($type, $name);
+
+  $self->_apply_runlist($obj, $opt);
+
+  for my $k ( sort keys %{$setters{$type}} ) {
+    if ( my $method = $setters{$type}{$k} ) {
+      $self->_set_attributes($obj, $opt, $k, $method);
+    }
+    elsif ( $opt->{$k} ) {
+      $k = ucfirst $k;
+      warn "$k attributes do not apply to $type objects.  Skipping them.\n";
+    }
   }
 
-  if ($opt->{default}) {
-    for my $attr ( @{ $opt->{default} } ) {
+  $obj->save;
+  return;
+}
+
+sub _apply_runlist {
+  my ($self, $obj, $opt) = @_;
+  if ($opt->{role}) {
+    $obj->append_to_run_list(map { "role[$_]" } @{$opt->{role}});
+  }
+  if ($opt->{recipe}) {
+    $obj->append_to_run_list(map { "recipe[$_]" } @{$opt->{recipe}});
+  }
+  return;
+}
+
+sub _set_attributes {
+  my ($self, $obj, $opt, $which, $method) = @_;
+  if ($opt->{$which}) {
+    for my $attr ( @{ $opt->{$which} } ) {
       my ($key, $value) = split /=/, $attr, 2; # split on first '='
       if ( $value =~ /(?<!\\),/ ) {
         # split on unescaped commas, then unescape escaped commas
         $value = [ map { s/\\,/,/gr } split /(?<!\\),/, $value ];
       }
-      $node->set_attribute($key, $value);
+      $obj->$method($key, $value);
     }
   }
-
-  $node->save;
+  return;
 }
+
 
 1;
 
@@ -64,7 +110,7 @@ Pantry::App::Command::apply - Implements pantry apply subcommand
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

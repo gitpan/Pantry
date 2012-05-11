@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry;
 # ABSTRACT: Configuration management tool for chef-solo
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 # This file is a namespace placeholder and gives a default place to find
 # documentation for the 'pantry' program.
@@ -26,7 +26,7 @@ Pantry - Configuration management tool for chef-solo
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -65,14 +65,17 @@ creates some directories for use storing cookbooks, node data, etc.
 =head3 list
 
   $ pantry list nodes
+  $ pantry list roles
 
-Prints to STDOUT a list of nodes managed within the pantry.
+Prints to STDOUT a list of nodes or roles managed within the pantry.
 
 =head2 Managing nodes
 
 In this section, when a node NAME is required, the name is
 expected to be a valid DNS name or IP address.  The name
-will be converted to lowercase for consistency.
+will be converted to lowercase for consistency.  When referring
+to an existing node, you may often abbreviate it to a unique
+prefix, e.g. "foo" for "foo.example.com".
 
 Also, whenever a command takes a single 'node NAME' target,
 you may give a single dash ('-') as the NAME and the command
@@ -96,7 +99,7 @@ Creates a node configuration file for the given C<NAME>.
 Renames a node to a new name.  The old node data file
 is renamed.  The C<NAME> must exist.
 
-=head3 delete 
+=head3 delete
 
   $ pantry delete node NAME
 
@@ -112,9 +115,14 @@ Prints to STDOUT the JSON data for the given C<NAME>.
 
 =head3 apply
 
-  $ pantry apply node NAME --recipe nginx --default nginx.port=80
+  $ pantry apply node NAME --recipe nginx --role mail --default nginx.port=80
 
-Applies recipes or attributes to the given C<NAME>.
+Applies recipes, roles or attributes to the given C<NAME>.
+
+To apply a role to the node's C<run_list>, specify C<--role role> or C<-R role>.
+May be specified multiple times to apply more than one role.  Roles will
+be appended to the C<run_list> before after any existing entries but before
+any recipes specified in the same command.
 
 To apply a recipe to the node's C<run_list>, specify C<--recipe RECIPE> or C<-r
 RECIPE>.  May be specified multiple times to apply more than one recipe.
@@ -151,11 +159,17 @@ will be added to the node's data structure like this:
 Both C<KEY> and C<VALUE> support periods and commas (respectively) to be
 escaped by a backslash.
 
+N.B. While the term C<--default> is used for command line consistency, attributes
+set on nodes actually have what Chef terms "normal" precedence.
+
 =head3 strip
 
-  $ pantry strip node NAME --recipe nginx --default nginx.port
+  $ pantry strip node NAME --recipe nginx --role mail --default nginx.port
 
-Strips recipes or attributes from the given C<NAME>.
+Strips recipes, roles or attributes from the given C<NAME>.
+
+To strip a role to the node's C<run_list>, specify C<--role role> or C<-R role>.
+May be specified multiple times to strip more than one role.
 
 To strip a recipe to the node's C<run_list>, specify C<--recipe RECIPE> or C<-r
 RECIPE>.  May be specified multiple times to strip more than one recipe.
@@ -183,6 +197,47 @@ the configuration file for the C<name> node.
 The resulting file must be valid JSON in a form acceptable to Chef.  Generally,
 you should use the C<apply> or C<strip> commands instead of editing the node
 file directly.
+
+=head2 Managing roles
+
+In this section, when a role NAME is required, any name without whitespace is
+acceptable. The name will be converted to lowercase for consistency.  When
+referring to an existing role, you may often abbreviate it to a unique prefix,
+e.g. "web" for "webserver".
+
+Also, whenever a command takes a single 'node NAME' target,
+you may give a single dash ('-') as the NAME and the command
+will be run against a list of roles read from STDIN.
+
+You can combine this with the C<pantry list> command to do
+batch operations.  For example, to add a recipe to all roles:
+
+  $ pantry list roles | pantry apply role - --recipe ntp
+
+=head3 create, rename, delete, show and edit
+
+These commands work the same as they do for nodes.
+The difference is that you must specify the 'role' type:
+
+  $ pantry create role web
+  $ pantry show role web
+
+=head3 apply and strip
+
+The C<apply> and C<strip> commands have slight differences, as roles have two
+kinds of attributes, "default attributes" (C<--default> or C<-d>) and "override
+attributes" (C<--override> or C<-O>), with slightly different precedence.
+
+  $ pantry apply role NAME -d nginx.user=nobody -O nginx.port=80
+  $ pantry strip role NAME -d nginx.user -O nginx.port
+
+The C<--recipe> (C<-r>) and C<--role> (C<-R>) arguments work the same as for nodes.
+Note that roles can have other roles in their C<run_list>.
+
+When Chef merges attribute, the role default attribute has the lower precedence
+than node attributes.  Override attributes have higher precedence than node
+attributes. Yes, this is a gross simplification of how Chef does it.  See Chef
+docs for more: L<http://wiki.opscode.com/display/chef/Attributes>
 
 =head2 Getting help
 

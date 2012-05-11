@@ -2,7 +2,7 @@ NAME
     Pantry - Configuration management tool for chef-solo
 
 VERSION
-    version 0.004
+    version 0.005
 
 SYNOPSIS
       $ mkdir my-project
@@ -35,13 +35,16 @@ USAGE
 
    list
       $ pantry list nodes
+      $ pantry list roles
 
-    Prints to STDOUT a list of nodes managed within the pantry.
+    Prints to STDOUT a list of nodes or roles managed within the pantry.
 
   Managing nodes
     In this section, when a node NAME is required, the name is expected to
     be a valid DNS name or IP address. The name will be converted to
-    lowercase for consistency.
+    lowercase for consistency. When referring to an existing node, you may
+    often abbreviate it to a unique prefix, e.g. "foo" for
+    "foo.example.com".
 
     Also, whenever a command takes a single 'node NAME' target, you may give
     a single dash ('-') as the NAME and the command will be run against a
@@ -75,9 +78,14 @@ USAGE
     Prints to STDOUT the JSON data for the given "NAME".
 
    apply
-      $ pantry apply node NAME --recipe nginx --default nginx.port=80
+      $ pantry apply node NAME --recipe nginx --role mail --default nginx.port=80
 
-    Applies recipes or attributes to the given "NAME".
+    Applies recipes, roles or attributes to the given "NAME".
+
+    To apply a role to the node's "run_list", specify "--role role" or "-R
+    role". May be specified multiple times to apply more than one role.
+    Roles will be appended to the "run_list" before after any existing
+    entries but before any recipes specified in the same command.
 
     To apply a recipe to the node's "run_list", specify "--recipe RECIPE" or
     "-r RECIPE". May be specified multiple times to apply more than one
@@ -115,10 +123,17 @@ USAGE
     Both "KEY" and "VALUE" support periods and commas (respectively) to be
     escaped by a backslash.
 
-   strip
-      $ pantry strip node NAME --recipe nginx --default nginx.port
+    N.B. While the term "--default" is used for command line consistency,
+    attributes set on nodes actually have what Chef terms "normal"
+    precedence.
 
-    Strips recipes or attributes from the given "NAME".
+   strip
+      $ pantry strip node NAME --recipe nginx --role mail --default nginx.port
+
+    Strips recipes, roles or attributes from the given "NAME".
+
+    To strip a role to the node's "run_list", specify "--role role" or "-R
+    role". May be specified multiple times to strip more than one role.
 
     To strip a recipe to the node's "run_list", specify "--recipe RECIPE" or
     "-r RECIPE". May be specified multiple times to strip more than one
@@ -145,6 +160,46 @@ USAGE
     The resulting file must be valid JSON in a form acceptable to Chef.
     Generally, you should use the "apply" or "strip" commands instead of
     editing the node file directly.
+
+  Managing roles
+    In this section, when a role NAME is required, any name without
+    whitespace is acceptable. The name will be converted to lowercase for
+    consistency. When referring to an existing role, you may often
+    abbreviate it to a unique prefix, e.g. "web" for "webserver".
+
+    Also, whenever a command takes a single 'node NAME' target, you may give
+    a single dash ('-') as the NAME and the command will be run against a
+    list of roles read from STDIN.
+
+    You can combine this with the "pantry list" command to do batch
+    operations. For example, to add a recipe to all roles:
+
+      $ pantry list roles | pantry apply role - --recipe ntp
+
+   create, rename, delete, show and edit
+    These commands work the same as they do for nodes. The difference is
+    that you must specify the 'role' type:
+
+      $ pantry create role web
+      $ pantry show role web
+
+   apply and strip
+    The "apply" and "strip" commands have slight differences, as roles have
+    two kinds of attributes, "default attributes" ("--default" or "-d") and
+    "override attributes" ("--override" or "-O"), with slightly different
+    precedence.
+
+      $ pantry apply role NAME -d nginx.user=nobody -O nginx.port=80
+      $ pantry strip role NAME -d nginx.user -O nginx.port
+
+    The "--recipe" ("-r") and "--role" ("-R") arguments work the same as for
+    nodes. Note that roles can have other roles in their "run_list".
+
+    When Chef merges attribute, the role default attribute has the lower
+    precedence than node attributes. Override attributes have higher
+    precedence than node attributes. Yes, this is a gross simplification of
+    how Chef does it. See Chef docs for more:
+    <http://wiki.opscode.com/display/chef/Attributes>
 
   Getting help
    commands

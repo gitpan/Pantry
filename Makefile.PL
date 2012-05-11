@@ -14,11 +14,8 @@ my %WriteMakefileArgs = (
   "BUILD_REQUIRES" => {
     "App::Cmd::Tester" => 0,
     "App::Cmd::Tester::CaptureExternal" => 0,
-    "Capture::Tiny" => 0,
-    "Exporter" => 0,
     "File::Find" => 0,
     "File::pushd" => "1.00",
-    "Scalar::Util" => 0,
     "Test::More" => "0.96",
     "parent" => 0
   },
@@ -33,6 +30,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Pantry",
   "PREREQ_PM" => {
     "App::Cmd::Setup" => "0.317",
+    "Exporter" => 0,
     "File::Basename" => 0,
     "File::Path" => 0,
     "File::Slurp" => 0,
@@ -55,9 +53,9 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
-    "TESTS" => "t/*.t t/app/*.t t/app/apply/*.t t/app/create/*.t t/app/delete/*.t t/app/edit/*.t t/app/init/*.t t/app/list/*.t t/app/rename/*.t t/app/show/*.t t/app/strip/*.t t/model/*.t"
+    "TESTS" => "t/*.t t/app/*.t t/app/init/*.t t/model/*.t"
   }
 );
 

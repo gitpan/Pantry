@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::delete;
 # ABSTRACT: Implements pantry delete subcommand
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -19,7 +19,7 @@ sub command_type {
 }
 
 sub valid_types {
-  return qw/node/
+  return qw/node role/
 }
 
 sub options {
@@ -30,21 +30,28 @@ sub options {
 
 sub _delete_node {
   my ($self, $opt, $name) = @_;
+  $self->_delete_obj($opt, "node", $name);
+}
 
-  my $node = $self->pantry->node( $name );
-  if ( ! -e $node->path ) {
-    die( "Node '$name' doesn't exist\n" );
-  }
+sub _delete_role {
+  my ($self, $opt, $name) = @_;
+  $self->_delete_obj($opt, "role", $name);
+}
+
+sub _delete_obj {
+  my ($self, $opt, $type, $name) = @_;
+
+  my $obj = $self->_check_name($type, $name);
 
   unless ( $opt->{force} ) {
-    my $confirm = IO::Prompt::Tiny::prompt("Delete node '$name'?", "no");
+    my $confirm = IO::Prompt::Tiny::prompt("Delete $type '$name'?", "no");
     unless ($confirm =~ /^y(?:es)?$/i) {
       print "$name will not be deleted\n";
       exit 0;
     }
   }
 
-  unlink $node->path;
+  unlink $obj->path;
 
   return;
 }
@@ -63,7 +70,7 @@ Pantry::App::Command::delete - Implements pantry delete subcommand
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::rename;
 # ABSTRACT: Implements pantry rename subcommand
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -19,23 +19,34 @@ sub command_type {
 }
 
 sub valid_types {
-  return qw/node/
+  return qw/node role/
 }
 
-sub _rename_node{
+sub _rename_node {
   my ($self, $opt, $name, $dest) = @_;
+  return $self->_rename_obj($opt, 'node', $name, $dest);
+}
 
-  my $node = $self->pantry->node( $name );
-  my $dest_path = $self->pantry->node( $dest )->path;
-  if ( ! -e $node->path ) {
-    die( "Node '$name' doesn't exist\n" );
+sub _rename_role {
+  my ($self, $opt, $name, $dest) = @_;
+  return $self->_rename_obj($opt, 'role', $name, $dest);
+}
+
+sub _rename_obj {
+  my ($self, $opt, $type, $name, $dest) = @_;
+
+  my $obj = $self->_check_name($type, $name);
+  my $dest_path = $self->pantry->$type( $dest )->path;
+
+  if ( ! -e $obj->path ) {
+    die( "$type '$name' doesn't exist\n" );
   }
   elsif ( -e $dest_path ) {
-    die( "Node '$dest' already exists. Won't over-write it.\n" );
+    die( "$type '$dest' already exists. Won't over-write it.\n" );
   }
   else {
-    $node->save_as( $dest_path );
-    unlink $node->path;
+    $obj->save_as( $dest_path );
+    unlink $obj->path;
   }
 
   return;
@@ -55,7 +66,7 @@ Pantry::App::Command::rename - Implements pantry rename subcommand
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
