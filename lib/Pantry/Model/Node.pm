@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::Model::Node;
 # ABSTRACT: Pantry data model for nodes
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use Moose 2;
 use MooseX::Types::Path::Class::MoreCoercions qw/File/;
@@ -50,13 +50,32 @@ has attributes => (
 );
 
 
+has pantry_host => (
+  is => 'ro',
+  isa => 'Str',
+);
+
+
+has pantry_port => (
+  is => 'ro',
+  isa => 'Int',
+);
+
+
+
+has pantry_user => (
+  is => 'ro',
+  isa => 'Str',
+);
+
+
 sub save {
   my ($self) = @_;
   die "No _path attribute set" unless $self->has_path;
   return $self->save_as( $self->path );
 }
 
-my @top_level_keys = qw/name run_list/;
+my @top_level_keys = qw/name run_list pantry_host pantry_port pantry_user/;
 
 sub _freeze {
   my ($self, $data) = @_;
@@ -98,7 +117,7 @@ Pantry::Model::Node - Pantry data model for nodes
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -129,6 +148,23 @@ of recipes (or roles) to be configured by C<chef-solo>.
 This attribute holds node attribute data as key-value pairs.  Keys may
 be separated by a period to indicate nesting (literal periods must be
 escaped by a backslash).  Values should be scalars or array references.
+
+=head2 pantry_host
+
+This optional attribute holds an alternate hostname or IP address to use for
+the SSH connection within C<pantry sync>.  In all other respects, the node will
+still be referenced by the C<name> attribute.
+
+=head2 pantry_port
+
+This optional attribute holds an alternate port number to use for the SSH
+connection within C<pantry sync>.
+
+=head2 pantry_user
+
+This optional attribute holds an alternate user for the SSH
+connection within C<pantry sync>.  (The default is C<root>.)
+This user B<must> have password-less sudo permissions.
 
 =head1 METHODS
 

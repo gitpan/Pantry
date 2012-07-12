@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::Model::Role;
 # ABSTRACT: Pantry data model for Chef roles
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use Moose 2;
 use MooseX::Types::Path::Class::MoreCoercions qw/File/;
@@ -132,7 +132,7 @@ Pantry::Model::Role - Pantry data model for Chef roles
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 

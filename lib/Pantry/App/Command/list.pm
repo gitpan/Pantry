@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::list;
 # ABSTRACT: Implements pantry list subcommand
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -51,7 +51,7 @@ Pantry::App::Command::list - Implements pantry list subcommand
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

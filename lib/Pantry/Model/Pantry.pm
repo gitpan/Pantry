@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::Model::Pantry;
 # ABSTRACT: Pantry data model for a pantry directory
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use Moose 2;
 use MooseX::Types::Path::Class::MoreCoercions 0.002 qw/AbsDir/;
@@ -55,7 +55,8 @@ sub all_nodes {
 
 
 sub node {
-  my ($self, $node_name, $env) = @_;
+  my ($self, $node_name, $options ) = @_;
+  $options //= {};
   $node_name = lc $node_name;
   require Pantry::Model::Node;
   my $path = $self->_node_path( $node_name );
@@ -63,7 +64,7 @@ sub node {
     return Pantry::Model::Node->new_from_file( $path );
   }
   else {
-    return Pantry::Model::Node->new( name => $node_name, _path => $path );
+    return Pantry::Model::Node->new( name => $node_name, _path => $path, %$options );
   }
 }
 
@@ -114,7 +115,7 @@ Pantry::Model::Pantry - Pantry data model for a pantry directory
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

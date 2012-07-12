@@ -1,5 +1,13 @@
 Revision history for pantry
 
+0.006     2012-07-12 14:34:17 America/New_York
+
+    [Added]
+
+    - 'pantry create' now accepts 'host', 'port', and 'user'
+      parameters that override the default SSH connection
+      settings.
+
 0.005     2012-05-11 13:25:40 America/New_York
 
     [Added]

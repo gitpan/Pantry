@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry;
 # ABSTRACT: Configuration management tool for chef-solo
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 # This file is a namespace placeholder and gives a default place to find
 # documentation for the 'pantry' program.
@@ -26,7 +26,7 @@ Pantry - Configuration management tool for chef-solo
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -293,10 +293,6 @@ stay unlocked.
 In the future, I hope to extend pantry to support some or all of the following:
 
 =over 4
-
-=item *
-
-Chef role creation and application
 
 =item *
 

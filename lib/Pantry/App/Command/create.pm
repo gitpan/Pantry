@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::create;
 # ABSTRACT: Implements pantry create subcommand
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -18,6 +18,11 @@ sub command_type {
   return 'CREATE';
 }
 
+sub options {
+  my ($self) = @_;
+  return $self->ssh_options;
+}
+
 sub valid_types {
   return qw/node role/
 }
@@ -25,7 +30,12 @@ sub valid_types {
 sub _create_node {
   my ($self, $opt, $name) = @_;
 
-  my $node = $self->pantry->node( $name );
+  my %options;
+  for my $k ( qw/host port user/ ) {
+    $options{"pantry_$k"} = $opt->$k if $opt->$k;
+  }
+
+  my $node = $self->pantry->node( $name, \%options);
   if ( -e $node->path ) {
     $self->usage_error( "Node '$name' already exists" );
   }
@@ -64,7 +74,7 @@ Pantry::App::Command::create - Implements pantry create subcommand
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

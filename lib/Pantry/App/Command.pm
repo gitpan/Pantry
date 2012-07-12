@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command;
 # ABSTRACT: Pantry command superclass
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use App::Cmd::Setup -command;
 
@@ -224,6 +224,14 @@ runs.  Valid options include:
 HERE
 }
 
+sub ssh_options {
+  return (
+    [ 'host=s'        => "override SSH hostname (nodes only)" ],
+    [ 'port=i'        => "override SSH port     (nodes only)" ],
+    [ 'user=s'        => "override SSH username (nodes only)"],
+  );
+}
+
 sub data_options {
   return (
     [ 'recipe|r=s@'   => "A recipe (without 'recipe[...]')" ],
@@ -262,7 +270,7 @@ Pantry::App::Command - Pantry command superclass
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -272,6 +280,7 @@ and provides methods needed by all command subclasses.
 =for Pod::Coverage command_type
 valid_types
 data_options
+ssh_options
 options
 options_desc
 pantry

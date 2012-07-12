@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::init;
 # ABSTRACT: Implements pantry init subcommand
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -49,7 +49,7 @@ Pantry::App::Command::init - Implements pantry init subcommand
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ NAME
     Pantry - Configuration management tool for chef-solo
 
 VERSION
-    version 0.005
+    version 0.006
 
 SYNOPSIS
       $ mkdir my-project
@@ -252,8 +252,6 @@ AUTHENTICATION
 ROADMAP
     In the future, I hope to extend pantry to support some or all of the
     following:
-
-    *   Chef role creation and application
 
     *   environments
 
