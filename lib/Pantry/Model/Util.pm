@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::Model::Util;
 # ABSTRACT: Pantry data model utility subroutines
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use Exporter qw/import/;
 our @EXPORT_OK = qw/dot_to_hash hash_to_dot/;
@@ -56,7 +56,7 @@ Pantry::Model::Util - Pantry data model utility subroutines
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 DESCRIPTION
 

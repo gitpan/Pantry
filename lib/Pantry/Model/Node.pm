@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::Model::Node;
 # ABSTRACT: Pantry data model for nodes
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use Moose 2;
 use MooseX::Types::Path::Class::MoreCoercions qw/File/;
@@ -117,7 +117,7 @@ Pantry::Model::Node - Pantry data model for nodes
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -147,7 +147,9 @@ of recipes (or roles) to be configured by C<chef-solo>.
 
 This attribute holds node attribute data as key-value pairs.  Keys may
 be separated by a period to indicate nesting (literal periods must be
-escaped by a backslash).  Values should be scalars or array references.
+escaped by a backslash).  Values should be scalars or array references,
+except for boolean values which should be set as L<JSON::Boolean>
+values like C<JSON::true> and C<JSON::false>.
 
 =head2 pantry_host
 

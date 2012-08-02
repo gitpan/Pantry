@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry;
 # ABSTRACT: Configuration management tool for chef-solo
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 # This file is a namespace placeholder and gives a default place to find
 # documentation for the 'pantry' program.
@@ -26,7 +26,7 @@ Pantry - Configuration management tool for chef-solo
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -158,6 +158,9 @@ will be added to the node's data structure like this:
 
 Both C<KEY> and C<VALUE> support periods and commas (respectively) to be
 escaped by a backslash.
+
+If a C<VALUE> is a literal string containing 'true' or 'false', it will be
+replaced in the configuration data with actual JSON boolean values.
 
 N.B. While the term C<--default> is used for command line consistency, attributes
 set on nodes actually have what Chef terms "normal" precedence.

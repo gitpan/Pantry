@@ -16,6 +16,7 @@ my %WriteMakefileArgs = (
     "App::Cmd::Tester::CaptureExternal" => 0,
     "File::Find" => 0,
     "File::pushd" => "1.00",
+    "Test::Deep" => "0.110",
     "Test::More" => "0.96",
     "parent" => 0
   },
@@ -53,7 +54,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t t/app/*.t t/app/init/*.t t/model/*.t"
   }

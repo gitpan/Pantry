@@ -2,7 +2,7 @@ NAME
     Pantry - Configuration management tool for chef-solo
 
 VERSION
-    version 0.006
+    version 0.007
 
 SYNOPSIS
       $ mkdir my-project
@@ -122,6 +122,9 @@ USAGE
 
     Both "KEY" and "VALUE" support periods and commas (respectively) to be
     escaped by a backslash.
+
+    If a "VALUE" is a literal string containing 'true' or 'false', it will
+    be replaced in the configuration data with actual JSON boolean values.
 
     N.B. While the term "--default" is used for command line consistency,
     attributes set on nodes actually have what Chef terms "normal"

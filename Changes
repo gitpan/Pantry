@@ -1,5 +1,12 @@
 Revision history for pantry
 
+0.007     2012-08-02 19:20:08 America/New_York
+
+    [Added]
+
+    - 'pantry apply' now converts 'true' and 'false' to
+      actual JSON booleans in the configuration file
+
 0.006     2012-07-12 14:34:17 America/New_York
 
     [Added]

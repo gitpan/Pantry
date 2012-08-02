@@ -3,10 +3,11 @@ use warnings;
 
 package Pantry::App::Command::apply;
 # ABSTRACT: Implements pantry apply subcommand
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use Pantry::App -command;
 use autodie;
+use JSON;
 
 use namespace::clean;
 
@@ -87,7 +88,10 @@ sub _set_attributes {
       my ($key, $value) = split /=/, $attr, 2; # split on first '='
       if ( $value =~ /(?<!\\),/ ) {
         # split on unescaped commas, then unescape escaped commas
-        $value = [ map { s/\\,/,/gr } split /(?<!\\),/, $value ];
+        $value = [ map { $self->_boolify($_) } map { s/\\,/,/gr } split /(?<!\\),/, $value ];
+      }
+      else {
+        $value = $self->_boolify($value);
       }
       $obj->$method($key, $value);
     }
@@ -95,6 +99,16 @@ sub _set_attributes {
   return;
 }
 
+sub _boolify {
+  my ($self, $value) = @_;
+  if ($value eq 'false') {
+    $value = JSON::false;
+  }
+  elsif ( $value eq 'true' ) {
+    $value = JSON::true;
+  }
+  return $value;
+}
 
 1;
 
@@ -110,7 +124,7 @@ Pantry::App::Command::apply - Implements pantry apply subcommand
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
