@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::Model::Pantry;
 # ABSTRACT: Pantry data model for a pantry directory
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use Moose 2;
 use MooseX::Types::Path::Class::MoreCoercions 0.002 qw/AbsDir/;
@@ -35,6 +35,13 @@ sub _role_dir {
   return $path;
 }
 
+sub _cookbook_dir {
+  my ($self) = @_;
+  my $path = $self->path->subdir("cookbooks");
+  $path->mkpath;
+  return $path;
+}
+
 sub _role_path {
   my ($self, $role_name) = @_;
   return $self->_role_dir->file("${role_name}.json");
@@ -43,6 +50,11 @@ sub _role_path {
 sub _node_path {
   my ($self, $node_name, $env) = @_;
   return $self->_env_dir($env)->file("${node_name}.json");
+}
+
+sub _cookbook_path {
+  my ($self, $cookbook_name) = @_;
+  return $self->_cookbook_dir->subdir("${cookbook_name}");
 }
 
 
@@ -102,6 +114,15 @@ sub find_role {
   return map { $self->role($_) } grep { $_ =~ /^\Q$pattern\E/ } $self->all_roles;
 }
 
+
+sub cookbook {
+  my ($self, $cookbook_name, $env) = @_;
+  $cookbook_name = lc $cookbook_name;
+  require Pantry::Model::Cookbook;
+  my $path = $self->_cookbook_path( $cookbook_name );
+  return Pantry::Model::Cookbook->new( name => $cookbook_name, _path => $path );
+}
+
 1;
 
 
@@ -115,7 +136,7 @@ Pantry::Model::Pantry - Pantry data model for a pantry directory
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -183,6 +204,12 @@ Finds one or more role matching a leading part.  For example, given roles 'web'
 and 'mysql' in a pantry, use C<<$pantry->find_role("my")>> to get 'mysql'.
 
 Returns a list of role objects if any are found.
+
+=head2 C<cookbook>
+
+  my $node = $pantry->cookbook("myapp");
+
+Returns a L<Pantry::Model::Cookbook> object corresponding to the given cookbook.
 
 =head1 AUTHOR
 

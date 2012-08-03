@@ -26,6 +26,7 @@ lib
 Pantry
 App
 Model
+Cookbook
 Command
 show
 rename

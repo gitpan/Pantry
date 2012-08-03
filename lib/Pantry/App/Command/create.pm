@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::create;
 # ABSTRACT: Implements pantry create subcommand
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -24,7 +24,7 @@ sub options {
 }
 
 sub valid_types {
-  return qw/node role/
+  return qw/node role cookbook/
 }
 
 sub _create_node {
@@ -60,6 +60,20 @@ sub _create_role {
   return;
 }
 
+sub _create_cookbook {
+  my ($self, $opt, $name) = @_;
+
+  my $cookbook = $self->pantry->cookbook( $name );
+  if ( -e $cookbook->path ) {
+    $self->usage_error( "Cookbook '$name' already exists" );
+  }
+  else {
+    $cookbook->create_boilerplate;
+  }
+
+  return;
+}
+
 1;
 
 
@@ -74,7 +88,7 @@ Pantry::App::Command::create - Implements pantry create subcommand
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

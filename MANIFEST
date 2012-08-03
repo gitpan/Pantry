@@ -22,6 +22,7 @@ lib/Pantry/App/Command/show.pm
 lib/Pantry/App/Command/strip.pm
 lib/Pantry/App/Command/sync.pm
 lib/Pantry/Model.pm
+lib/Pantry/Model/Cookbook.pm
 lib/Pantry/Model/Node.pm
 lib/Pantry/Model/Pantry.pm
 lib/Pantry/Model/Role.pm
