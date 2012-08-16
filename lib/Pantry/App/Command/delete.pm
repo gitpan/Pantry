@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::delete;
 # ABSTRACT: Implements pantry delete subcommand
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -19,10 +19,11 @@ sub command_type {
 }
 
 sub valid_types {
-  return qw/node role/
+  return qw/node role environment/
 }
 
 sub options {
+  my ($self) = @_;
   return (
     ['force|f', "force deletion without confirmation"],
   );
@@ -38,10 +39,17 @@ sub _delete_role {
   $self->_delete_obj($opt, "role", $name);
 }
 
+sub _delete_environment {
+  my ($self, $opt, $name) = @_;
+  $self->_delete_obj($opt, "environment", $name);
+}
+
 sub _delete_obj {
   my ($self, $opt, $type, $name) = @_;
 
-  my $obj = $self->_check_name($type, $name);
+  my $options;
+  $options->{env} = $opt->{env} if $opt->{env};
+  my $obj = $self->_check_name($type, $name, $options);
 
   unless ( $opt->{force} ) {
     my $confirm = IO::Prompt::Tiny::prompt("Delete $type '$name'?", "no");
@@ -70,7 +78,7 @@ Pantry::App::Command::delete - Implements pantry delete subcommand
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

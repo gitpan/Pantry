@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::list;
 # ABSTRACT: Implements pantry list subcommand
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -18,13 +18,18 @@ sub command_type {
   return 'TYPE';
 }
 
+sub options {
+  my ($self) = @_;
+  return ($self->selector_options);
+}
+
 sub valid_types {
-  return qw/node nodes role roles/
+  return qw/node nodes role roles environment environments/
 }
 
 sub _list_nodes {
   my ($self, $opt) = @_;
-  say $_ for $self->pantry->all_nodes;
+  say $_ for $self->pantry->all_nodes($opt);
 }
 
 *_list_node = *_list_nodes; # alias
@@ -35,6 +40,13 @@ sub _list_roles {
 }
 
 *_list_role = *_list_roles; # alias
+
+sub _list_environments {
+  my ($self, $opt) = @_;
+  say $_ for $self->pantry->all_environments;
+}
+
+*_list_environment = *_list_environments; # alias
 
 1;
 
@@ -51,7 +63,7 @@ Pantry::App::Command::list - Implements pantry list subcommand
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

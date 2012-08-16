@@ -1,5 +1,13 @@
 Revision history for pantry
 
+0.009     2012-08-16 14:56:25 America/New_York
+
+    [Added]
+
+    - Added support for multiple environments, including
+      environment attributes and environment-specific
+      run lists in roles
+
 0.008     2012-08-02 22:53:18 America/New_York
 
     [Added]

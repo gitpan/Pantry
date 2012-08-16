@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::rename;
 # ABSTRACT: Implements pantry rename subcommand
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -19,7 +19,7 @@ sub command_type {
 }
 
 sub valid_types {
-  return qw/node role/
+  return qw/node role environment/
 }
 
 sub _rename_node {
@@ -32,11 +32,22 @@ sub _rename_role {
   return $self->_rename_obj($opt, 'role', $name, $dest);
 }
 
+sub _rename_environment {
+  my ($self, $opt, $name, $dest) = @_;
+  return $self->_rename_obj($opt, 'environment', $name, $dest);
+}
+
 sub _rename_obj {
   my ($self, $opt, $type, $name, $dest) = @_;
 
   my $obj = $self->_check_name($type, $name);
-  my $dest_path = $self->pantry->$type( $dest )->path;
+  my $dest_path;
+  if ( $type eq 'node' ) {
+    $dest_path = $self->pantry->$type( $dest, {env => $obj->env} )->path;
+  }
+  else {
+    $dest_path = $self->pantry->$type( $dest )->path;
+  }
 
   if ( ! -e $obj->path ) {
     die( "$type '$name' doesn't exist\n" );
@@ -66,7 +77,7 @@ Pantry::App::Command::rename - Implements pantry rename subcommand
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

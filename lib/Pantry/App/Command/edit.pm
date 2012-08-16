@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::edit;
 # ABSTRACT: Implements pantry edit subcommand
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -23,7 +23,7 @@ sub command_type {
 }
 
 sub valid_types {
-  return qw/node role/
+  return qw/node role environment/
 }
 
 sub _edit_node {
@@ -34,6 +34,11 @@ sub _edit_node {
 sub _edit_role {
   my ($self, $opt, $name) = @_;
   $self->_edit_obj($opt, 'role', $name);
+}
+
+sub _edit_environment {
+  my ($self, $opt, $name) = @_;
+  $self->_edit_obj($opt, 'environment', $name);
 }
 
 sub _edit_obj {
@@ -48,6 +53,7 @@ sub _edit_obj {
   }
 
   my $obj = $self->_check_name($type, $name);
+
   my $path = $obj->path;
 
   if ( -e $path ) {
@@ -78,7 +84,7 @@ Pantry::App::Command::edit - Implements pantry edit subcommand
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

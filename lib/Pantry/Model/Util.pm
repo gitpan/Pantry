@@ -3,10 +3,11 @@ use warnings;
 
 package Pantry::Model::Util;
 # ABSTRACT: Pantry data model utility subroutines
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use Exporter qw/import/;
-our @EXPORT_OK = qw/dot_to_hash hash_to_dot/;
+use Hash::Merge ();
+our @EXPORT_OK = qw/dot_to_hash hash_to_dot merge_hash/;
 
 sub dot_to_hash {
   my ($hash, $key, $value) = @_;
@@ -44,6 +45,12 @@ sub hash_to_dot {
   }
 }
 
+sub merge_hash {
+  my ($base, $override) = @_;
+  my $merger = Hash::Merge->new( 'STORAGE_PRECEDENT' );
+  return $merger->merge( $override, $base );
+}
+
 1;
 
 
@@ -56,13 +63,13 @@ Pantry::Model::Util - Pantry data model utility subroutines
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 DESCRIPTION
 
 Internal functions.  No user-serviceable parts
 
-=for Pod::Coverage hash_to_dot dot_to_hash
+=for Pod::Coverage hash_to_dot dot_to_hash merge_hash
 
 =head1 AUTHOR
 

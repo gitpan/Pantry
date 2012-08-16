@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package Pantry::Role::Serializable;
 # ABSTRACT: A role to save/load data to/from JSON files
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use MooseX::Role::Parameterized;
 use Moose::Util qw/get_all_attribute_values/;
@@ -12,6 +12,7 @@ use namespace::autoclean;
 use File::Basename qw/dirname/;
 use File::Path qw/mkpath/;
 use File::Slurp qw/read_file write_file/;
+use Storable qw/dclone/;
 use JSON 2;
 
 parameter freezer => (
@@ -52,7 +53,7 @@ role {
     delete $data->{$_} for grep { /^_/ } keys %$data; # delete private attributes
 
     if ($freezer) {
-      $data = $self->$freezer($data);
+      $data = $self->$freezer(dclone $data);
     }
 
     # XXX check if string needs UTF-8 encoding?
@@ -89,7 +90,7 @@ Pantry::Role::Serializable - A role to save/load data to/from JSON files
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

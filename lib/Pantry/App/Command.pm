@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command;
 # ABSTRACT: Pantry command superclass
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use App::Cmd::Setup -command;
 
@@ -242,6 +242,12 @@ sub data_options {
   );
 }
 
+sub selector_options {
+  return (
+    [ 'env|E=s'       => "Deployment environment selector" ],
+  );
+}
+
 sub _check_name {
   my ($self, $type, $name) = @_;
   my $meth = "find_$type";
@@ -271,7 +277,7 @@ Pantry::App::Command - Pantry command superclass
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 DESCRIPTION
 
@@ -279,12 +285,13 @@ This internal implementation class defines common command line options
 and provides methods needed by all command subclasses.
 
 =for Pod::Coverage command_type
-valid_types
 data_options
-ssh_options
 options
 options_desc
 pantry
+selector_options
+ssh_options
+valid_types
 validate
 
 =head1 AUTHOR

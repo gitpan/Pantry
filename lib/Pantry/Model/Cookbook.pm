@@ -4,7 +4,7 @@ use warnings;
 package Pantry::Model::Cookbook;
 
 # ABSTRACT: Pantry data model for Chef cookbooks
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use Moose 2;
 use MooseX::Types::Path::Class::MoreCoercions qw/Dir/;
@@ -84,7 +84,7 @@ Pantry::Model::Cookbook - Pantry data model for Chef cookbooks
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 DESCRIPTION
 

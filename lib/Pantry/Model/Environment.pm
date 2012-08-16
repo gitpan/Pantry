@@ -1,15 +1,14 @@
-use v5.14;
+use 5.008001;
+use strict;
 use warnings;
 
-package Pantry::Model::Role;
-# ABSTRACT: Pantry data model for Chef roles
+package Pantry::Model::Environment;
+# ABSTRACT: Pantry data model for Chef environments
 our $VERSION = '0.009'; # VERSION
 
 use Moose 2;
 use MooseX::Types::Path::Class::MoreCoercions qw/File/;
-use Carp qw/croak/;
 use List::AllUtils qw/uniq first/;
-use Pantry::Model::EnvRunList;
 use Pantry::Model::Util qw/hash_to_dot dot_to_hash/;
 use namespace::autoclean;
 
@@ -19,11 +18,8 @@ with 'Pantry::Role::Serializable' => {
   thawer => '_thaw',
 };
 
-# in_run_list, append_to_runliset
-with 'Pantry::Role::Runlist';
-
 #--------------------------------------------------------------------------#
-# Chef role attributes
+# Chef environment attributes
 #--------------------------------------------------------------------------#
 
 has _path => (
@@ -48,12 +44,12 @@ has description => (
 
 sub _build_description {
   my $self = shift;
-  return "The " . $self->name . " role";
+  return "The " . $self->name . " environment";
 }
 
 
 has default_attributes => (
-  is => 'bare',
+  is => 'ro',
   isa => 'HashRef',
   traits => ['Hash'],
   default => sub { +{} },
@@ -66,7 +62,7 @@ has default_attributes => (
 
 
 has override_attributes => (
-  is => 'bare',
+  is => 'ro',
   isa => 'HashRef',
   traits => ['Hash'],
   default => sub { +{} },
@@ -76,52 +72,6 @@ has override_attributes => (
     delete_override_attribute => 'delete',
   },
 );
-
-has env_run_lists => (
-  is => 'bare',
-  isa => 'HashRef[Pantry::Model::EnvRunList]',
-  traits => ['Hash'],
-  default => sub { +{} },
-  handles => {
-    set_env_run_list => 'set',
-    get_env_run_list => 'get',
-    delete_env_run_list => 'delete',
-  },
-);
-
-
-sub append_to_env_run_list {
-  my ($self, $env, $items) = @_;
-  croak "append_to_env_runlist requires an environment name"
-    unless $env;
-  croak "append_to_env_runlist requires an array reference of items to append"
-    unless ref($items) eq 'ARRAY';
-
-  my $runlist;
-  unless ( $runlist = $self->get_env_run_list($env) ) {
-    $runlist = Pantry::Model::EnvRunList->new;
-    $self->set_env_run_list( $env => $runlist );
-  }
-
-  $runlist->append_to_run_list( @$items );
-  return;
-}
-
-
-
-sub remove_from_env_run_list {
-  my ($self, $env, $items) = @_;
-  croak "remove_from_env_runlist requires an environment name"
-    unless $env;
-  croak "remove_from_env_runlist requires an array reference of items to append"
-    unless ref($items) eq 'ARRAY';
-
-  if ( my $runlist = $self->get_env_run_list($env) ) {
-    $runlist->remove_from_run_list( @$items );
-  }
-
-  return;
-}
 
 
 sub save {
@@ -142,12 +92,8 @@ sub _freeze {
     }
     $data->{$attr} = $new;
   }
-  for my $env ( keys %{$data->{env_run_lists}} ) {
-    my $obj = delete $data->{env_run_lists}{$env};
-    $data->{env_run_lists}{$env} = [ $obj->run_list ];
-  }
-  $data->{json_class} = "Chef::Role";
-  $data->{chef_type} = "role";
+  $data->{json_class} = "Chef::Environment";
+  $data->{chef_type} = "environment";
   return $data;
 }
 
@@ -167,11 +113,6 @@ sub _thaw {
     }
     $data->{$attr} = $new;
   }
-  for my $env ( keys %{$data->{env_run_lists}} ) {
-    my $obj = Pantry::Model::EnvRunList->new;
-    $obj->append_to_run_list(@{delete $data->{env_run_lists}{$env}});
-    $data->{env_run_lists}{$env} = $obj;
-  }
   return $data;
 }
 
@@ -185,7 +126,7 @@ __END__
 
 =head1 NAME
 
-Pantry::Model::Role - Pantry data model for Chef roles
+Pantry::Model::Environment - Pantry data model for Chef environments
 
 =head1 VERSION
 
@@ -199,13 +140,13 @@ Under development.
 
 =head2 default_attributes
 
-This attribute holds role default attribute data as key-value pairs.  Keys may
+This attribute holds environment default attribute data as key-value pairs.  Keys may
 be separated by a period to indicate nesting (literal periods must be
 escaped by a backslash).  Values should be scalars or array references.
 
 =head2 override_attributes
 
-This attribute holds role override attribute data as key-value pairs.  Keys may
+This attribute holds environment override attribute data as key-value pairs.  Keys may
 be separated by a period to indicate nesting (literal periods must be
 escaped by a backslash).  Values should be scalars or array references.
 
@@ -213,51 +154,39 @@ escaped by a backslash).  Values should be scalars or array references.
 
 =head2 set_default_attribute
 
-  $role->set_default_attribute("nginx.port", 80);
+  $environment->set_default_attribute("nginx.port", 80);
 
-Sets the role default attribute for the given key to the given value.
+Sets the environment default attribute for the given key to the given value.
 
 =head2 get_default_attribute
 
-  my $port = $role->get_default_attribute("nginx.port");
+  my $port = $environment->get_default_attribute("nginx.port");
 
-Returns the role default attribute for the given key.
+Returns the environment default attribute for the given key.
 
 =head2 delete_default_attribute
 
-  $role->delete_default_attribute("nginx.port");
+  $environment->delete_default_attribute("nginx.port");
 
-Deletes the role default attribute for the given key.
+Deletes the environment default attribute for the given key.
 
 =head2 set_override_attribute
 
-  $role->set_override_attribute("nginx.port", 80);
+  $environment->set_override_attribute("nginx.port", 80);
 
-Sets the role override attribute for the given key to the given value.
+Sets the environment override attribute for the given key to the given value.
 
 =head2 get_override_attribute
 
-  my $port = $role->get_override_attribute("nginx.port");
+  my $port = $environment->get_override_attribute("nginx.port");
 
-Returns the role override attribute for the given key.
+Returns the environment override attribute for the given key.
 
 =head2 delete_override_attribute
 
-  $role->delete_override_attribute("nginx.port");
+  $environment->delete_override_attribute("nginx.port");
 
-Deletes the role override attribute for the given key.
-
-=head2 append_to_env_run_list
-
-  $role->append_to_env_run_list( $env, \@items );
-
-Appends items to an environment-specific runlist.
-
-=head2 remove_from_env_run_list
-
-  $role->remove_from_env_run_list( $env, \@items );
-
-Removes items from an environment-specific runlist.
+Deletes the environment override attribute for the given key.
 
 =head2 save
 

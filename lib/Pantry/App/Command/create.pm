@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::create;
 # ABSTRACT: Implements pantry create subcommand
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -20,11 +20,11 @@ sub command_type {
 
 sub options {
   my ($self) = @_;
-  return $self->ssh_options;
+  return ($self->ssh_options, $self->selector_options);
 }
 
 sub valid_types {
-  return qw/node role cookbook/
+  return qw/node role environment cookbook/
 }
 
 sub _create_node {
@@ -34,6 +34,7 @@ sub _create_node {
   for my $k ( qw/host port user/ ) {
     $options{"pantry_$k"} = $opt->$k if $opt->$k;
   }
+  $options{env} = $opt->{env} if $opt->{env};
 
   my $node = $self->pantry->node( $name, \%options);
   if ( -e $node->path ) {
@@ -55,6 +56,20 @@ sub _create_role {
   }
   else {
     $role->save;
+  }
+
+  return;
+}
+
+sub _create_environment {
+  my ($self, $opt, $name) = @_;
+
+  my $environment = $self->pantry->environment( $name );
+  if ( -e $environment->path ) {
+    $self->usage_error( "Environment '$name' already exists" );
+  }
+  else {
+    $environment->save;
   }
 
   return;
@@ -88,7 +103,7 @@ Pantry::App::Command::create - Implements pantry create subcommand
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

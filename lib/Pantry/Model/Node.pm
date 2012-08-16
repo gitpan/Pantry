@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::Model::Node;
 # ABSTRACT: Pantry data model for nodes
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use Moose 2;
 use MooseX::Types::Path::Class::MoreCoercions qw/File/;
@@ -22,6 +22,13 @@ has name => (
   is => 'ro',
   isa => 'Str',
   required => 1,
+);
+
+
+has env => (
+  is => 'ro',
+  isa => 'Str',
+  default => '_default',
 );
 
 
@@ -75,10 +82,11 @@ sub save {
   return $self->save_as( $self->path );
 }
 
-my @top_level_keys = qw/name run_list pantry_host pantry_port pantry_user/;
+my @top_level_keys = qw/name run_list pantry_host pantry_port pantry_user chef_environment/;
 
 sub _freeze {
   my ($self, $data) = @_;
+  $data->{chef_environment} = delete $data->{env};
   my $attr = delete $data->{attributes};
   for my $k ( keys %$attr ) {
     next if grep { $k eq $_ } @top_level_keys;
@@ -100,6 +108,7 @@ sub _thaw {
     }
   }
   $data->{attributes} = $attr;
+  $data->{env} = delete( $data->{chef_environment} ) || "_default";
   return $data;
 }
 
@@ -117,7 +126,7 @@ Pantry::Model::Node - Pantry data model for nodes
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -137,6 +146,11 @@ Models the configuration data for a specific server.
 =head2 name
 
 This attribute is the canonical name of the node, generally a fully-qualified domain name
+
+=head2 name
+
+This attribute is the name of the environment to which the node belongs.  This defaults
+to C<_default>.
 
 =head2 run_list
 

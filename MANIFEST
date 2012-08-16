@@ -23,6 +23,8 @@ lib/Pantry/App/Command/strip.pm
 lib/Pantry/App/Command/sync.pm
 lib/Pantry/Model.pm
 lib/Pantry/Model/Cookbook.pm
+lib/Pantry/Model/EnvRunList.pm
+lib/Pantry/Model/Environment.pm
 lib/Pantry/Model/Node.pm
 lib/Pantry/Model/Pantry.pm
 lib/Pantry/Model/Role.pm
@@ -39,15 +41,14 @@ t/app/help.t
 t/app/init/dir.t
 t/app/init/nondestructive.t
 t/app/list.t
-t/app/options.t
 t/app/rename.t
 t/app/show.t
 t/app/strip.t
 t/lib/TestHelper.pm
+t/model/environment.t
 t/model/node.t
 t/model/pantry.t
 t/model/role.t
-t/privlib/Pantry/App/Command/clidump.pm
 xt/author/critic.t
 xt/author/pod-spell.t
 xt/release/distmeta.t

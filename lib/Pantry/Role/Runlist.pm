@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package Pantry::Role::Runlist;
 # ABSTRACT: A role to manage entries in a run_list
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use Moose::Role;
 use namespace::autoclean;
@@ -17,6 +17,7 @@ has run_list => (
     run_list => 'elements',
     _push_run_list => 'push',
     _clear_run_list => 'clear',
+    is_empty => 'is_empty',
   },
 );
 
@@ -58,7 +59,7 @@ Pantry::Role::Runlist - A role to manage entries in a run_list
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 DESCRIPTION
 
