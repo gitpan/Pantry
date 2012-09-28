@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::create;
 # ABSTRACT: Implements pantry create subcommand
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -20,81 +20,63 @@ sub command_type {
 
 sub options {
   my ($self) = @_;
-  return ($self->ssh_options, $self->selector_options);
+  return ( $self->ssh_options, $self->selector_options );
 }
 
+# These get auto-generated creator methods
+my %creators = (
+  role        => 'save',
+  environment => 'save',
+  bag         => 'save',
+  cookbook    => 'create_boilerplate',
+);
+
+# Nodes get custom processing
 sub valid_types {
-  return qw/node role environment cookbook/
+  return qw/node/, keys %creators;
+}
+
+while ( my ( $type, $method ) = each %creators ) {
+  no strict 'refs';
+  *{"_create_$type"} = sub {
+    my ( $self, $opt, $name ) = @_;
+    return $self->_generic_create( $name, $type, $method );
+  };
 }
 
 sub _create_node {
-  my ($self, $opt, $name) = @_;
+  my ( $self, $opt, $name ) = @_;
 
   my %options;
-  for my $k ( qw/host port user/ ) {
+  for my $k (qw/host port user/) {
     $options{"pantry_$k"} = $opt->$k if $opt->$k;
   }
   $options{env} = $opt->{env} if $opt->{env};
 
-  my $node = $self->pantry->node( $name, \%options);
-  if ( -e $node->path ) {
-    $self->usage_error( "Node '$name' already exists" );
-  }
-  else {
-    $node->save;
-  }
-
-  return;
+  return $self->_generic_create( $name, 'node', 'save', \%options );
 }
 
-sub _create_role {
-  my ($self, $opt, $name) = @_;
+sub _generic_create {
+  my ( $self, $name, $type, $init, $options ) = @_;
 
-  my $role = $self->pantry->role( $name );
-  if ( -e $role->path ) {
-    $self->usage_error( "Role '$name' already exists" );
+  my $obj = $self->pantry->$type( $name, $options );
+  if ( -e $obj->path ) {
+    $type = uc $type;
+    $self->usage_error("$type '$name' already exists");
   }
   else {
-    $role->save;
+    $obj->$init;
   }
 
-  return;
+  return $obj;
 }
-
-sub _create_environment {
-  my ($self, $opt, $name) = @_;
-
-  my $environment = $self->pantry->environment( $name );
-  if ( -e $environment->path ) {
-    $self->usage_error( "Environment '$name' already exists" );
-  }
-  else {
-    $environment->save;
-  }
-
-  return;
-}
-
-sub _create_cookbook {
-  my ($self, $opt, $name) = @_;
-
-  my $cookbook = $self->pantry->cookbook( $name );
-  if ( -e $cookbook->path ) {
-    $self->usage_error( "Cookbook '$name' already exists" );
-  }
-  else {
-    $cookbook->create_boilerplate;
-  }
-
-  return;
-}
-
 1;
 
 
 # vim: ts=2 sts=2 sw=2 et:
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -103,7 +85,7 @@ Pantry::App::Command::create - Implements pantry create subcommand
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -129,4 +111,3 @@ This is free software, licensed under:
   The Apache License, Version 2.0, January 2004
 
 =cut
-

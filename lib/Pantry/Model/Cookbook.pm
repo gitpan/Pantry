@@ -4,7 +4,7 @@ use warnings;
 package Pantry::Model::Cookbook;
 
 # ABSTRACT: Pantry data model for Chef cookbooks
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use Moose 2;
 use MooseX::Types::Path::Class::MoreCoercions qw/Dir/;
@@ -76,6 +76,7 @@ sub create_boilerplate {
 # vim: ts=2 sts=2 sw=2 et:
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -84,7 +85,7 @@ Pantry::Model::Cookbook - Pantry data model for Chef cookbooks
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 DESCRIPTION
 
@@ -109,4 +110,3 @@ This is free software, licensed under:
   The Apache License, Version 2.0, January 2004
 
 =cut
-

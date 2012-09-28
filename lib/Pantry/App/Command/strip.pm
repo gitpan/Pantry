@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::strip;
 # ABSTRACT: Implements pantry strip subcommand
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -18,28 +18,9 @@ sub command_type {
   return 'TARGET';
 }
 
-sub valid_types {
-  return qw/node role environment/
-}
-
 sub options {
   my ($self) = @_;
   return ($self->data_options, $self->selector_options);
-}
-
-sub _strip_node {
-  my ($self, $opt, $name) = @_;
-  $self->_strip_obj($opt, 'node', $name);
-}
-
-sub _strip_role {
-  my ($self, $opt, $name) = @_;
-  $self->_strip_obj($opt, 'role', $name);
-}
-
-sub _strip_environment {
-  my ($self, $opt, $name) = @_;
-  $self->_strip_obj($opt, 'environment', $name);
 }
 
 my %strippers = (
@@ -55,7 +36,23 @@ my %strippers = (
     default => 'delete_default_attribute',
     override => 'delete_override_attribute',
   },
+  bag => {
+    default => 'delete_attribute',
+    override => undef,
+  },
 );
+
+sub valid_types {
+  return keys %strippers;
+}
+
+for my $t ( keys %strippers ) {
+  no strict 'refs';
+  *{"_strip_$t"} = sub {
+    my ($self, $opt, $name) = @_;
+    $self->_strip_obj($opt, $t, $name);
+  };
+}
 
 sub _strip_obj {
   my ($self, $opt, $type, $name) = @_;
@@ -139,6 +136,7 @@ sub _delete_attributes {
 # vim: ts=2 sts=2 sw=2 et:
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -147,7 +145,7 @@ Pantry::App::Command::strip - Implements pantry strip subcommand
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -173,4 +171,3 @@ This is free software, licensed under:
   The Apache License, Version 2.0, January 2004
 
 =cut
-

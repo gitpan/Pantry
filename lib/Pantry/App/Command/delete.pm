@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::delete;
 # ABSTRACT: Implements pantry delete subcommand
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -18,10 +18,6 @@ sub command_type {
   return 'TARGET';
 }
 
-sub valid_types {
-  return qw/node role environment/
-}
-
 sub options {
   my ($self) = @_;
   return (
@@ -29,19 +25,18 @@ sub options {
   );
 }
 
-sub _delete_node {
-  my ($self, $opt, $name) = @_;
-  $self->_delete_obj($opt, "node", $name);
+my @types = qw/node role environment bag/;
+
+sub valid_types {
+  return @types;
 }
 
-sub _delete_role {
-  my ($self, $opt, $name) = @_;
-  $self->_delete_obj($opt, "role", $name);
-}
-
-sub _delete_environment {
-  my ($self, $opt, $name) = @_;
-  $self->_delete_obj($opt, "environment", $name);
+for my $t ( @types ) {
+  no strict 'refs';
+  *{"_delete_$t"} = sub {
+    my ($self, $opt, $name) = @_;
+    $self->_delete_obj($opt, $t, $name);
+  };
 }
 
 sub _delete_obj {
@@ -70,6 +65,7 @@ sub _delete_obj {
 # vim: ts=2 sts=2 sw=2 et:
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -78,7 +74,7 @@ Pantry::App::Command::delete - Implements pantry delete subcommand
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -104,4 +100,3 @@ This is free software, licensed under:
   The Apache License, Version 2.0, January 2004
 
 =cut
-

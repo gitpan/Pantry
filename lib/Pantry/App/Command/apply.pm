@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::apply;
 # ABSTRACT: Implements pantry apply subcommand
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -24,25 +24,6 @@ sub options {
   return ($self->data_options, $self->selector_options);
 }
 
-sub valid_types {
-  return qw/node role environment/
-}
-
-sub _apply_node {
-  my ($self, $opt, $name) = @_;
-  $self->_apply_obj($opt, 'node', $name);
-}
-
-sub _apply_role {
-  my ($self, $opt, $name) = @_;
-  $self->_apply_obj($opt, 'role', $name);
-}
-
-sub _apply_environment {
-  my ($self, $opt, $name) = @_;
-  $self->_apply_obj($opt, 'environment', $name);
-}
-
 my %setters = (
   node => {
     default => 'set_attribute',
@@ -56,7 +37,23 @@ my %setters = (
     default => 'set_default_attribute',
     override => 'set_override_attribute',
   },
+  bag => {
+    default => 'set_attribute',
+    override => undef,
+  },
 );
+
+sub valid_types {
+  return keys %setters;
+}
+
+for my $t ( keys %setters ) {
+  no strict 'refs';
+  *{"_apply_$t"} = sub {
+    my ($self, $opt, $name) = @_;
+    $self->_apply_obj($opt, $t, $name);
+  };
+}
 
 sub _apply_obj {
   my ($self, $opt, $type, $name) = @_;
@@ -151,6 +148,7 @@ sub _boolify {
 # vim: ts=2 sts=2 sw=2 et:
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -159,7 +157,7 @@ Pantry::App::Command::apply - Implements pantry apply subcommand
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -185,4 +183,3 @@ This is free software, licensed under:
   The Apache License, Version 2.0, January 2004
 
 =cut
-

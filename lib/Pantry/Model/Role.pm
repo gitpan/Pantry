@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::Model::Role;
 # ABSTRACT: Pantry data model for Chef roles
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use Moose 2;
 use MooseX::Types::Path::Class::MoreCoercions qw/File/;
@@ -181,6 +181,7 @@ sub _thaw {
 # vim: ts=2 sts=2 sw=2 et:
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -189,7 +190,7 @@ Pantry::Model::Role - Pantry data model for Chef roles
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 DESCRIPTION
 
@@ -277,4 +278,3 @@ This is free software, licensed under:
   The Apache License, Version 2.0, January 2004
 
 =cut
-

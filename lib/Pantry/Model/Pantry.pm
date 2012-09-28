@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::Model::Pantry;
 # ABSTRACT: Pantry data model for a pantry directory
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use Moose 2;
 use MooseX::Types::Path::Class::MoreCoercions 0.002 qw/AbsDir/;
@@ -51,6 +51,13 @@ sub _cookbook_dir {
   return $path;
 }
 
+sub _bag_dir {
+  my ($self) = @_;
+  my $path = $self->path->subdir("data_bags");
+  $path->mkpath;
+  return $path;
+}
+
 # file path where environment JSON file is located
 sub _environment_path {
   my ($self, $env) = @_;
@@ -70,6 +77,11 @@ sub _role_path {
 sub _cookbook_path {
   my ($self, $cookbook_name) = @_;
   return $self->_cookbook_dir->subdir("${cookbook_name}");
+}
+
+sub _bag_path {
+  my ($self, $bag_name) = @_;
+  return $self->_bag_dir->file("${bag_name}.json");
 }
 
 
@@ -178,11 +190,42 @@ sub cookbook {
   return Pantry::Model::Cookbook->new( name => $cookbook_name, _path => $path );
 }
 
+
+sub all_bags {
+  my ($self, $env) = @_;
+  my $pcr = Path::Class::Rule->new->file;
+  my @bags =
+    sort map { s/\.json$//r }
+    map { $_->relative($self->_bag_dir) }
+    $pcr->all( $self->_bag_dir );
+  return @bags;
+}
+
+
+sub bag {
+  my ($self, $bag_name, $options) = @_;
+  my ($dir_name, $item_name) = split "/", lc $bag_name;
+  $item_name //= $bag_name;
+  require Pantry::Model::DataBag;
+  my $path = $self->_bag_path( $bag_name );
+  if ( -e $path ) {
+    return Pantry::Model::DataBag->new_from_file( $path );
+  }
+  else {
+    return Pantry::Model::DataBag->new( name => $item_name, _path => $path );
+  }
+}
+
+
+sub find_bag {
+  my ($self, $pattern, $options) = @_;
+  return map { $self->bag($_) } grep { $_ =~ /^\Q$pattern\E/ } $self->all_bags;
+}
+
 1;
 
-
-
 __END__
+
 =pod
 
 =head1 NAME
@@ -191,7 +234,7 @@ Pantry::Model::Pantry - Pantry data model for a pantry directory
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -288,6 +331,30 @@ Returns a list of environment objects if any are found.
 
 Returns a L<Pantry::Model::Cookbook> object corresponding to the given cookbook.
 
+=head2 all_bags
+
+  my @bags = $pantry->all_bags;
+
+In list context, returns a list of bags.  In scalar context, returns
+a count of bags.
+
+=head2 C<bag>
+
+  my $node = $pantry->bag("xdg");
+
+Returns a L<Pantry::Model::DataBag> object corresponding to the given bag.
+If the bag exists in the pantry, it will be loaded from the saved bag file.
+Otherwise, it will be created in memory (but will not be persisted to disk).
+
+=head2 find_bag
+
+  my @bags = $pantry->find_bag( $leading_part );
+
+Finds one or more bag matching a leading part.  For example, given bags 'web'
+and 'mysql' in a pantry, use C<<$pantry->find_bag("my")>> to get 'mysql'.
+
+Returns a list of bag objects if any are found.
+
 =head1 AUTHOR
 
 David Golden <dagolden@cpan.org>
@@ -301,4 +368,3 @@ This is free software, licensed under:
   The Apache License, Version 2.0, January 2004
 
 =cut
-

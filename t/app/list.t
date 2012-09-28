@@ -43,6 +43,12 @@ my @cases = (
     names => ['test', 'prod'],
     new => sub { my ($p,$n) = @_; $p->environment($n) },
   },
+  {
+    label => "bags",
+    type => "bag",
+    names => ['xdg', 'dag', 'users/egg'],
+    new => sub { my ($p,$n) = @_; $p->bag($n) },
+  },
 );
 
 for my $c ( @cases ) {

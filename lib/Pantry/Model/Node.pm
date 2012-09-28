@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::Model::Node;
 # ABSTRACT: Pantry data model for nodes
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use Moose 2;
 use MooseX::Types::Path::Class::MoreCoercions qw/File/;
@@ -114,10 +114,8 @@ sub _thaw {
 
 1;
 
-
-
-
 __END__
+
 =pod
 
 =head1 NAME
@@ -126,7 +124,7 @@ Pantry::Model::Node - Pantry data model for nodes
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -220,4 +218,3 @@ This is free software, licensed under:
   The Apache License, Version 2.0, January 2004
 
 =cut
-

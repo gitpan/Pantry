@@ -88,6 +88,21 @@ my @cases = (
       templates     => { 'default' => {} },
     },
   },
+  {
+    label => "bag",
+    type => "bag",
+    name => 'xdg',
+    new => sub { my ($p,$n) = @_; $p->bag($n) },
+    empty => {},
+  },
+  {
+    label => "bag with subdirectory",
+    type => "bag",
+    name => 'users/xdg',
+    new => sub { my ($p,$n) = @_; $p->bag($n) },
+    empty => {},
+  },
+
 );
 
 for my $c ( @cases ) {
@@ -107,7 +122,10 @@ for my $c ( @cases ) {
     else {
       my $data = _thaw_file( $obj->path );
 
-      is ( delete $data->{name}, $c->{name}, "$c->{type} name set correctly in data file" );
+      my $id_field = $c->{type} eq 'bag' ? 'id' : 'name';
+      my ($first, $last) = split "/", $c->{name};
+      $last //= $first;
+      is ( delete $data->{$id_field}, $last, "$c->{type} name set correctly in data file" );
 
       is_deeply( $data, $c->{empty}, "remaining fields correctly set for empty $c->{type}" )
         or diag explain($data);

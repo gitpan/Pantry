@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package Pantry::Role::Serializable;
 # ABSTRACT: A role to save/load data to/from JSON files
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use MooseX::Role::Parameterized;
 use Moose::Util qw/get_all_attribute_values/;
@@ -82,6 +82,7 @@ role {
 # vim: ts=2 sts=2 sw=2 et:
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -90,7 +91,7 @@ Pantry::Role::Serializable - A role to save/load data to/from JSON files
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -163,4 +164,3 @@ This is free software, licensed under:
   The Apache License, Version 2.0, January 2004
 
 =cut
-

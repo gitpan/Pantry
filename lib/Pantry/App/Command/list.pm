@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::list;
 # ABSTRACT: Implements pantry list subcommand
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -23,30 +23,22 @@ sub options {
   return ($self->selector_options);
 }
 
+my @types = qw/node role environment bag/;
+
 sub valid_types {
-  return qw/node nodes role roles environment environments/
+  return map { ($_, "${_}s") } @types;
 }
 
-sub _list_nodes {
-  my ($self, $opt) = @_;
-  say $_ for $self->pantry->all_nodes($opt);
+for my $t ( @types ) {
+  no strict 'refs';
+  my $plural = $t . "s";
+  my $method = "all_$plural";
+  *{"_list_$t"} = sub {
+    my ($self, $opt) = @_;
+    say $_ for $self->pantry->$method($opt);
+  };
+  *{"_list_$plural"} = *{"_list_$t"};
 }
-
-*_list_node = *_list_nodes; # alias
-
-sub _list_roles {
-  my ($self, $opt) = @_;
-  say $_ for $self->pantry->all_roles;
-}
-
-*_list_role = *_list_roles; # alias
-
-sub _list_environments {
-  my ($self, $opt) = @_;
-  say $_ for $self->pantry->all_environments;
-}
-
-*_list_environment = *_list_environments; # alias
 
 1;
 
@@ -55,6 +47,7 @@ sub _list_environments {
 # vim: ts=2 sts=2 sw=2 et:
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -63,7 +56,7 @@ Pantry::App::Command::list - Implements pantry list subcommand
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -99,4 +92,3 @@ This is free software, licensed under:
   The Apache License, Version 2.0, January 2004
 
 =cut
-

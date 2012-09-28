@@ -2,7 +2,7 @@ NAME
     Pantry - Configuration management tool for chef-solo
 
 VERSION
-    version 0.009
+    version 0.010
 
 SYNOPSIS
       $ mkdir my-project
@@ -31,13 +31,15 @@ USAGE
       $ pantry init
 
     This initializes a pantry in the current directory. Currently, it just
-    creates some directories for use storing cookbooks, node data, etc.
+    creates some directories for use storing cookbooks, node data, data
+    bags, etc.
 
    list
       $ pantry list nodes
       $ pantry list roles
       $ pantry list environments
       $ pantry list cookbooks
+      $ pantry list bags
 
     Prints to STDOUT a list of items of a particular type managed within the
     pantry.
@@ -229,6 +231,44 @@ USAGE
       $ pantry apply role web -r nginx
       $ pantry apply role web -r ufw -E production
 
+  Managing data bags
+    In this section, when a bag NAME is required, any name without
+    whitespace is acceptable. The name will be converted to lowercase for
+    consistency. When referring to an existing bag, you may often abbreviate
+    it to a unique prefix, e.g. "users/d" for "users/dagolden".
+
+    Note that data bags may exist at the "top" level or within
+    subdirectories and so either of these forms are acceptable as bag names:
+
+    *   top_level_bag
+
+    *   bag_name/item_name
+
+    Also, whenever a command takes a single 'bag NAME' target, you may give
+    a single dash ('-') as the NAME and the command will be run against a
+    list of bags read from STDIN.
+
+    You can combine this with the "pantry list" command to do batch
+    operations.
+
+      $ pantry list bags | grep users | pantry apply bag - -d remove=true
+
+   create, rename, delete, show and edit
+    These commands work the same as they do for nodes. The difference is
+    that you must specify the 'bag' type:
+
+      $ pantry create bag users/dagolden
+      $ pantry show bag users/dagolden
+
+   apply and strip
+    The "apply" and "strip" commands have slight differences, as bags don't
+    have attributes in the way that nodes or roles do. The "default" flags
+    are used and just set fields in the top level of the bag. (Don't set
+    "id" or bad things might happen.)
+
+      $ pantry apply bag NAME -d key=value
+      $ pantry strip bag NAME -d key
+
   Managing environments
     In this section, when a environment NAME is required, any name without
     whitespace is acceptable. The name will be converted to lowercase for
@@ -361,8 +401,6 @@ ROADMAP
 
     *   searching nodes based on configuration
 
-    *   data bags
-
     *   encrypted data bags (or equivalent functionality)
 
     *   cookbook download from Opscode community repository
@@ -383,11 +421,13 @@ SEE ALSO
 
     *   pocketknife <http://github.com/igal/pocketknife> (Ruby)
 
+    *   knife-solo <https://github.com/matschaffer/knife-solo> (Ruby)
+
 SUPPORT
   Bugs / Feature Requests
     Please report any bugs or feature requests through the issue tracker at
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Pantry>. You will be
-    notified automatically of any progress on your issue.
+    <https://github.com/dagolden/pantry/issues>. You will be notified
+    automatically of any progress on your issue.
 
   Source Code
     This is open source software. The code repository is available for

@@ -23,6 +23,7 @@ lib/Pantry/App/Command/strip.pm
 lib/Pantry/App/Command/sync.pm
 lib/Pantry/Model.pm
 lib/Pantry/Model/Cookbook.pm
+lib/Pantry/Model/DataBag.pm
 lib/Pantry/Model/EnvRunList.pm
 lib/Pantry/Model/Environment.pm
 lib/Pantry/Model/Node.pm
@@ -45,6 +46,7 @@ t/app/rename.t
 t/app/show.t
 t/app/strip.t
 t/lib/TestHelper.pm
+t/model/databag.t
 t/model/environment.t
 t/model/node.t
 t/model/pantry.t

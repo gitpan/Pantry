@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry;
 # ABSTRACT: Configuration management tool for chef-solo
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 # This file is a namespace placeholder and gives a default place to find
 # documentation for the 'pantry' program.
@@ -15,9 +15,8 @@ our $VERSION = '0.009'; # VERSION
 
 # vim: ts=2 sts=2 sw=2 et:
 
-
-
 __END__
+
 =pod
 
 =head1 NAME
@@ -26,7 +25,7 @@ Pantry - Configuration management tool for chef-solo
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -60,7 +59,7 @@ See the following sections for details and examples by topic.
   $ pantry init
 
 This initializes a pantry in the current directory.  Currently, it just
-creates some directories for use storing cookbooks, node data, etc.
+creates some directories for use storing cookbooks, node data, data bags, etc.
 
 =head3 list
 
@@ -68,6 +67,7 @@ creates some directories for use storing cookbooks, node data, etc.
   $ pantry list roles
   $ pantry list environments
   $ pantry list cookbooks
+  $ pantry list bags
 
 Prints to STDOUT a list of items of a particular type managed within the
 pantry.
@@ -267,6 +267,55 @@ or omit it to apply/strip from the default list.
   $ pantry apply role web -r nginx
   $ pantry apply role web -r ufw -E production
 
+=head2 Managing data bags
+
+In this section, when a bag NAME is required, any name without whitespace is
+acceptable. The name will be converted to lowercase for consistency.  When
+referring to an existing bag, you may often abbreviate it to a unique prefix,
+e.g. "users/d" for "users/dagolden".
+
+Note that data bags may exist at the "top" level or within subdirectories and
+so either of these forms are acceptable as bag names:
+
+=over 4
+
+=item *
+
+top_level_bag
+
+=item *
+
+bag_name/item_name
+
+=back
+
+Also, whenever a command takes a single 'bag NAME' target,
+you may give a single dash ('-') as the NAME and the command
+will be run against a list of bags read from STDIN.
+
+You can combine this with the C<pantry list> command to do
+batch operations.
+
+  $ pantry list bags | grep users | pantry apply bag - -d remove=true
+
+=head3 create, rename, delete, show and edit
+
+These commands work the same as they do for nodes.
+The difference is that you must specify the 'bag' type:
+
+  $ pantry create bag users/dagolden
+  $ pantry show bag users/dagolden
+
+=head3 apply and strip
+
+The C<apply> and C<strip> commands have slight differences, as bags don't have
+attributes in the way that nodes or roles do.  The "default" flags are used
+and just set fields in the top level of the bag.  (Don't set "id" or bad things
+might happen.)
+
+  $ pantry apply bag NAME -d key=value
+  $ pantry strip bag NAME -d key
+
 =head2 Managing environments
 
 In this section, when a environment NAME is required, any name without
@@ -418,10 +467,6 @@ searching nodes based on configuration
 
 =item *
 
-data bags
-
-=item *
-
 encrypted data bags (or equivalent functionality)
 
 =item *
@@ -454,6 +499,10 @@ littlechef L<http://github.com/tobami/littlechef> (Python)
 
 pocketknife L<http://github.com/igal/pocketknife> (Ruby)
 
+=item *
+
+knife-solo L<https://github.com/matschaffer/knife-solo> (Ruby)
+
 =back
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
@@ -463,7 +512,7 @@ pocketknife L<http://github.com/igal/pocketknife> (Ruby)
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests through the issue tracker
-at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Pantry>.
+at L<https://github.com/dagolden/pantry/issues>.
 You will be notified automatically of any progress on your issue.
 
 =head2 Source Code
@@ -488,4 +537,3 @@ This is free software, licensed under:
   The Apache License, Version 2.0, January 2004
 
 =cut
-

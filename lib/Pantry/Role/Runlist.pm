@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package Pantry::Role::Runlist;
 # ABSTRACT: A role to manage entries in a run_list
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use Moose::Role;
 use namespace::autoclean;
@@ -49,8 +49,8 @@ sub remove_from_run_list {
 
 1;
 
-
 __END__
+
 =pod
 
 =head1 NAME
@@ -59,7 +59,7 @@ Pantry::Role::Runlist - A role to manage entries in a run_list
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 DESCRIPTION
 
@@ -105,4 +105,3 @@ This is free software, licensed under:
   The Apache License, Version 2.0, January 2004
 
 =cut
-

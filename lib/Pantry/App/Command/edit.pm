@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::edit;
 # ABSTRACT: Implements pantry edit subcommand
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -22,23 +22,18 @@ sub command_type {
   return 'TARGET';
 }
 
+my @types = qw/node role environment bag/;
+
 sub valid_types {
-  return qw/node role environment/
+  return @types;
 }
 
-sub _edit_node {
-  my ($self, $opt, $name) = @_;
-  $self->_edit_obj($opt, 'node', $name);
-}
-
-sub _edit_role {
-  my ($self, $opt, $name) = @_;
-  $self->_edit_obj($opt, 'role', $name);
-}
-
-sub _edit_environment {
-  my ($self, $opt, $name) = @_;
-  $self->_edit_obj($opt, 'environment', $name);
+for my $t (@types) {
+  no strict 'refs';
+  *{"_edit_$t"} = sub {
+    my ($self, $opt, $name) = @_;
+    $self->_edit_obj($opt, $t, $name);
+  };
 }
 
 sub _edit_obj {
@@ -76,6 +71,7 @@ sub _edit_obj {
 # vim: ts=2 sts=2 sw=2 et:
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -84,7 +80,7 @@ Pantry::App::Command::edit - Implements pantry edit subcommand
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -110,4 +106,3 @@ This is free software, licensed under:
   The Apache License, Version 2.0, January 2004
 
 =cut
-

@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::sync;
 # ABSTRACT: Implements pantry sync subcommand
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -121,6 +121,10 @@ sub _sync_node {
   $ssh->rsync_put($rsync_opts, "roles", $dest_dir)
     or die "Could not rsync roles\n";
 
+  # rsync databags to remote /var/chef-solo/data_bags
+  $ssh->rsync_put($rsync_opts, "data_bags", $dest_dir)
+    or die "Could not rsync data_bags\n";
+
   # ssh execute chef-solo
   my $command = $sudo_i . "chef-solo -c $dest_dir/solo.rb";
   $command .= " -l debug" if $ENV{PANTRY_CHEF_DEBUG};
@@ -145,6 +149,7 @@ sub _solo_rb_guts {
 file_cache_path "$dest_dir"
 cookbook_path "$dest_dir/cookbooks"
 role_path "$dest_dir/roles"
+data_bag_path "$dest_dir/data_bags"
 json_attribs "$dest_dir/node.json"
 require 'chef/handler/json_file'
 report_handlers << Chef::Handler::JsonFile.new(:path => "$dest_dir/reports")
@@ -158,6 +163,7 @@ HERE
 # vim: ts=2 sts=2 sw=2 et:
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -166,7 +172,7 @@ Pantry::App::Command::sync - Implements pantry sync subcommand
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -192,4 +198,3 @@ This is free software, licensed under:
   The Apache License, Version 2.0, January 2004
 
 =cut
-

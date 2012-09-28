@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::show;
 # ABSTRACT: Implements pantry show subcommand
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -19,23 +19,18 @@ sub command_type {
   return 'TARGET';
 }
 
+my @types = qw/node role environment bag/;
+
 sub valid_types {
-  return qw/node role environment/
+  return @types;
 }
 
-sub _show_node {
-  my ($self, $opt, $name) = @_;
-  return $self->_show_obj($opt, 'node', $name);
-}
-
-sub _show_role {
-  my ($self, $opt, $name) = @_;
-  return $self->_show_obj($opt, 'role', $name);
-}
-
-sub _show_environment {
-  my ($self, $opt, $name) = @_;
-  return $self->_show_obj($opt, 'environment', $name);
+for my $t (@types) {
+  no strict 'refs';
+  *{"_show_$t"} = sub {
+    my ($self, $opt, $name) = @_;
+    return $self->_show_obj($opt, $t, $name);
+  };
 }
 
 sub _show_obj {
@@ -56,6 +51,7 @@ sub _show_obj {
 # vim: ts=2 sts=2 sw=2 et:
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -64,7 +60,7 @@ Pantry::App::Command::show - Implements pantry show subcommand
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -90,4 +86,3 @@ This is free software, licensed under:
   The Apache License, Version 2.0, January 2004
 
 =cut
-

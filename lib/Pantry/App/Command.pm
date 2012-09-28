@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command;
 # ABSTRACT: Pantry command superclass
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use App::Cmd::Setup -command;
 
@@ -269,6 +269,7 @@ sub _check_name {
 # vim: ts=2 sts=2 sw=2 et:
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -277,7 +278,7 @@ Pantry::App::Command - Pantry command superclass
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 DESCRIPTION
 
@@ -307,4 +308,3 @@ This is free software, licensed under:
   The Apache License, Version 2.0, January 2004
 
 =cut
-

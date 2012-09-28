@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::init;
 # ABSTRACT: Implements pantry init subcommand
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -17,6 +17,7 @@ my @pantry_dirs = qw(
   environments
   reports
   roles
+  data_bags
 );
 
 sub _init {
@@ -41,6 +42,7 @@ sub _init {
 # vim: ts=2 sts=2 sw=2 et:
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -49,7 +51,7 @@ Pantry::App::Command::init - Implements pantry init subcommand
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -75,4 +77,3 @@ This is free software, licensed under:
   The Apache License, Version 2.0, January 2004
 
 =cut
-
