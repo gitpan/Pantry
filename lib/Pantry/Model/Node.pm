@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::Model::Node;
 # ABSTRACT: Pantry data model for nodes
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use Moose 2;
 use MooseX::Types::Path::Class::MoreCoercions qw/File/;
@@ -124,7 +124,7 @@ Pantry::Model::Node - Pantry data model for nodes
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

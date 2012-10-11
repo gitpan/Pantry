@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command;
 # ABSTRACT: Pantry command superclass
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use App::Cmd::Setup -command;
 
@@ -248,6 +248,12 @@ sub selector_options {
   );
 }
 
+sub sync_options {
+  return (
+    [ 'reboot'       => "Reboot nodes after sync" ],
+  );
+}
+
 sub _check_name {
   my ($self, $type, $name) = @_;
   my $meth = "find_$type";
@@ -278,7 +284,7 @@ Pantry::App::Command - Pantry command superclass
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 DESCRIPTION
 
@@ -292,6 +298,7 @@ options_desc
 pantry
 selector_options
 ssh_options
+sync_options
 valid_types
 validate
 

@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::rename;
 # ABSTRACT: Implements pantry rename subcommand
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -73,7 +73,7 @@ Pantry::App::Command::rename - Implements pantry rename subcommand
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

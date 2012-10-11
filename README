@@ -2,7 +2,7 @@ NAME
     Pantry - Configuration management tool for chef-solo
 
 VERSION
-    version 0.011
+    version 0.012
 
 SYNOPSIS
       $ mkdir my-project
@@ -171,6 +171,10 @@ USAGE
     "chef-solo" via "ssh" to start a configuration run. After configuration,
     the latest run-report for the node is updated in the 'reports' directory
     of the pantry.
+
+    If the "--reboot" option is given, each node will be rebooted after the
+    synchronization run. This will only work on Unix hosts that can use the
+    "shutdown" command.
 
    edit
       $ pantry edit node NAME

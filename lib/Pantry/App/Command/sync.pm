@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::sync;
 # ABSTRACT: Implements pantry sync subcommand
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -24,6 +24,11 @@ sub abstract {
 
 sub command_type {
   return 'TARGET';
+}
+
+sub options {
+  my ($self) = @_;
+  return ( $self->sync_options );
 }
 
 sub valid_types {
@@ -139,6 +144,10 @@ sub _sync_node {
   dir("reports")->mkpath;
   $ssh->rsync_get($rsync_opts, "$dest_dir/reports/$report", "reports/$name");
 
+  if ( $opt->{reboot} ) {
+    $ssh->system($sudo . "shutdown -r now");
+  }
+
 }
 
 sub _solo_rb_guts {
@@ -171,7 +180,7 @@ Pantry::App::Command::sync - Implements pantry sync subcommand
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

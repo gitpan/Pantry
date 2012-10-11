@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::delete;
 # ABSTRACT: Implements pantry delete subcommand
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -74,7 +74,7 @@ Pantry::App::Command::delete - Implements pantry delete subcommand
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

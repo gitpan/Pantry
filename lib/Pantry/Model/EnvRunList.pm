@@ -4,7 +4,7 @@ use warnings;
 
 package Pantry::Model::EnvRunList;
 # ABSTRACT: Standalone runlist object for environment runlists
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use Moose 2;
 use namespace::autoclean;
@@ -26,7 +26,7 @@ Pantry::Model::EnvRunList - Standalone runlist object for environment runlists
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

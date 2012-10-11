@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry;
 # ABSTRACT: Configuration management tool for chef-solo
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 # This file is a namespace placeholder and gives a default place to find
 # documentation for the 'pantry' program.
@@ -25,7 +25,7 @@ Pantry - Configuration management tool for chef-solo
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -205,6 +205,10 @@ Copies cookbooks and configuration data to the C<NAME> node and invokes
 C<chef-solo> via C<ssh> to start a configuration run.  After configuration,
 the latest run-report for the node is updated in the 'reports' directory
 of the pantry.
+
+If the C<--reboot> option is given, each node will be rebooted after
+the synchronization run.  This will only work on Unix hosts that
+can use the C<shutdown> command.
 
 =head3 edit
 

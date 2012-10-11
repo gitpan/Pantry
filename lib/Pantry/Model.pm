@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::Model;
 # ABSTRACT: Pantry data model class framework
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 1;
 
@@ -17,7 +17,7 @@ Pantry::Model - Pantry data model class framework
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 DESCRIPTION
 
