@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package Pantry::Role::Serializable;
 # ABSTRACT: A role to save/load data to/from JSON files
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use MooseX::Role::Parameterized;
 use Moose::Util qw/get_all_attribute_values/;
@@ -91,7 +91,7 @@ Pantry::Role::Serializable - A role to save/load data to/from JSON files
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

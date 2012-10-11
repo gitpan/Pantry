@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App::Command::sync;
 # ABSTRACT: Implements pantry sync subcommand
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use Pantry::App -command;
 use autodie;
@@ -106,7 +106,6 @@ sub _sync_node {
     }
     my $merged = merge_hash( merge_hash( $env_default, $base ), $env_override );
     file($node_json)->spew( to_json( $merged, { utf8 => 1, pretty => 1 } ) );
-    say STDERR file($node_json)->slurp;
   }
 
   # rsync node JSON to remote /etc/chef/node.json
@@ -172,7 +171,7 @@ Pantry::App::Command::sync - Implements pantry sync subcommand
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

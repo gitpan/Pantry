@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::App;
 # ABSTRACT: Internal pantry application superclass
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use App::Cmd::Setup 0.317 -app;
 
@@ -26,7 +26,7 @@ Pantry::App - Internal pantry application superclass
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 DESCRIPTION
 

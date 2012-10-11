@@ -3,7 +3,7 @@ use warnings;
 
 package Pantry::Model::Util;
 # ABSTRACT: Pantry data model utility subroutines
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use Exporter qw/import/;
 use Hash::Merge ();
@@ -63,7 +63,7 @@ Pantry::Model::Util - Pantry data model utility subroutines
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 DESCRIPTION
 
